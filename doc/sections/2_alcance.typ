@@ -1,3 +1,4 @@
+// TODO: agregar informacion de acuerdo a mi proyecto
 = Alcance de solución
 == Descripción del proyecto a elaborar
 == Descripción de los procesos del negocio
