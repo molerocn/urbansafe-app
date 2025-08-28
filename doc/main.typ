@@ -4,7 +4,7 @@
   campus: [San Juan de Lurigancho],
   carrera: [Carrera de Ingeniería de Software],
   tipo_trabajo: [Proyecto de trabajo de investigación],
-  title: [UrbanSafe-ML: Desarrollo de un modelo de machine learning y aplicación movil para mejorar la seguridad ciudadana mediante predicción de riesgo en el distrito del Callao],
+  title: [UrbanSafe-ML: Desarrollo de un modelo de machine learning y aplicación movil para mejorar la seguridad ciudadana mediante predicción de riesgo en región Callao],
   autores: (
     [Juan Carlos Molero Rojas],
   ),
@@ -23,8 +23,8 @@
 // #outline(target: figure.where(kind: image), title: [Índice de figuras])
 // #pagebreak()
 
-// #outline(target: figure.where(kind: table), title: [Índice de tablas])
-// #pagebreak()
+#outline(target: figure.where(kind: table), title: [Índice de tablas])
+#pagebreak()
 
 // = Resumen
 // #pagebreak()
@@ -43,3 +43,4 @@
 #pagebreak()
 
 = Anexos
+#include "anexos/matriz_consistencia.typ"

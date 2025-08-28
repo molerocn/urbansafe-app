@@ -9,12 +9,15 @@
 == Problemas generales relacionados a otras fuentes
 
 == Marco teórico
-// TODO: completar esto xdd
-// variables dependientes
+// ---- variables dependientes
 // seguridad ciudadana
+// violencia fisica
+// violencia psicologica
+// hurto
 
-// variables independientes
-// Modelo de machine learning
+// ---- variables independientes
+// modelo de machine learning
+// aplicacion movil
 Con el propósito de definir la tecnología que se va a utilizar, #pc[@mitchell2013] define al machine learning como
 
 #pagebreak()
