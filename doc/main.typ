@@ -26,51 +26,20 @@
 // #outline(target: figure.where(kind: table), title: [Índice de tablas])
 // #pagebreak()
 
-= Resumen
+// = Resumen
+// #pagebreak()
+// = Abstract
+// #pagebreak()
+
+#include "sections/1_empresa.typ"
+#include "sections/2_alcance.typ"
+#include "sections/3_elaboracion_desarrollo.typ"
+#include "sections/4_objetivos_proyecto.typ"
+#include "sections/5_definicion_requerimientos.typ"
+#include "sections/6_analisis_situacion.typ"
+#include "sections/7_planificacion.typ"
+
+#bibliography("ref.bib", style: "apa")
 #pagebreak()
-= Abstract
-#pagebreak()
-
-= Empresa // (resumen ejecutivo)
-
-// https://web.regioncallao.gob.pe/mision-vision-y-objetivos/
-== Misión
-== Visión
-== Rubro del negocio // seguridad
-== Recurso humano // (cuantas personas trabajan en el area)
-== Aquipo Tecnologico // (actualidad de la empresa)
-=== Hardware
-=== Software y otros
-
-= Alcance de solución
-== Descripción del Proyecto a elaborar
-== Descripción de los procesos del Negocio
-== Alcance General
-== Limitaciones
-
-= Elaboración y desarrollo del proyecto
-== Problemática y posibles soluciones // cada problema por lo menos 4 parrafos
-== Elaboración de Prototipos // supongo que eso tiene que ver con figma o balsamiq
-
-= Objetivos del proyecto
-== Objetivo general
-== Objetivos específicos
-
-= Definición y Requerimientos del Proyecto 
-
-// dos antecedentes nacionales
-// dos antecedentes nacionales
-
-= Fundamento teórico
-// Modelo de machine learning
-Con el propósito de definir la tecnología que se va a utilizar, #pc[] define al machine learning como
-
-// seguridad ciudadana
 
 = Anexos
-
-Según #pc[@mitchell2013],
-
-#pagebreak()
-
-#bibliography("ref.bib")
