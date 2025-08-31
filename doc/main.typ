@@ -7,6 +7,10 @@
   title: [UrbanSafe-ML: Desarrollo de un modelo de machine learning y aplicación movil para mejorar la seguridad ciudadana mediante predicción de riesgo en región Callao],
   autores: (
     [Juan Carlos Molero Rojas],
+    [Adrian Enrique Torres Fernández],
+    [Adrian Enrique Torres Fernández],
+    [Adrian Enrique Torres Fernández],
+    [Adrian Enrique Torres Fernández],
   ),
   docentes: (
     [Effio Gonzales, Carlos Alberto],
