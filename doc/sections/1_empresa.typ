@@ -10,11 +10,11 @@ La visión del Gobierno Regional del Callao es consolidarse como un centro estra
 == Rubro del negocio // seguridad
 El Gobierno Regional del Callao es una institución pública dedicada a la gestión y administración del desarrollo regional en el ámbito político, social, económico y ambiental.
 
-== Recurso humano // (cuantas personas trabajan en el area)
-
-== Equipo tecnológico // (actualidad de la empresa)
-
-=== Hardware
-
-=== Software y otros
+// == Recurso humano // (cuantas personas trabajan en el area)
+// 
+// == Equipo tecnológico // (actualidad de la empresa)
+// 
+// === Hardware
+// 
+// === Software y otros
 #pagebreak()

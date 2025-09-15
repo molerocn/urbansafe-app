@@ -7,6 +7,7 @@
   (text: [seguridad ciudadana], signo: 1, gender: 0), // signo 0 "reduce" 1 "mejora" | gender 0 la, 1 el
   (text: [violencia psicológica], signo: 0, gender: 0),
   (text: [violencia física], signo: 0, gender: 0),
+  (text: [conducción en estado de ebriedad o drogadicción], signo: 0, gender: 0),
   (text: [hurto], signo: 0, gender: 1),
 )
 
@@ -29,8 +30,8 @@
   let variable_highlighted = highlight(variable.text)
 
   master.push((
-    problema: [¿En que medida #variable_independiente #verbo #prefijo #variable.text #post?],
-    objetivo: [Determinar en que medida #variable_independiente_highlighted #verbo #prefijo #variable_highlighted #post.],
+    problema: [¿En qué medida #variable_independiente #verbo #prefijo #variable.text #post?],
+    objetivo: [Determinar en qué medida #variable_independiente_highlighted #verbo #prefijo #variable_highlighted #post.],
     hipotesis: [#variable_independiente_highlighted #verbo significativamente #prefijo #variable_highlighted #post.],
   ))
 }

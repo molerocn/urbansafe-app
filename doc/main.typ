@@ -4,13 +4,12 @@
   campus: [San Juan de Lurigancho],
   carrera: [Carrera de Ingeniería de Software],
   tipo_trabajo: [Proyecto de trabajo de investigación],
-  title: [UrbanSafe-ML: Desarrollo de un modelo de machine learning y aplicación movil para mejorar la seguridad ciudadana mediante predicción de riesgo en región Callao],
+  title: [Aplicación móvil basada en Machine Learning para optimizar la predicción de riesgos y la seguridad ciudadana en la región Callao],
   autores: (
-    [Juan Carlos Molero Rojas],
-    [Adrian Enrique Torres Fernández],
-    [Adrian Enrique Torres Fernández],
-    [Adrian Enrique Torres Fernández],
-    [Adrian Enrique Torres Fernández],
+    [Molero Rojas, Juan Carlos],
+    [Torres Fernández, Adrian Enrique],
+    [Tito Auccatoma, Daniel Alvaro],
+    [Barreto Velasquez, Johan Alejandro]
   ),
   docentes: (
     [Effio Gonzales, Carlos Alberto],
@@ -24,8 +23,8 @@
 #outline(depth: 2)
 #pagebreak()
 
-// #outline(target: figure.where(kind: image), title: [Índice de figuras])
-// #pagebreak()
+#outline(target: figure.where(kind: image), title: [Índice de figuras])
+#pagebreak()
 
 #outline(target: figure.where(kind: table), title: [Índice de tablas])
 #pagebreak()
@@ -39,7 +38,7 @@
 #include "sections/2_alcance.typ"
 #include "sections/3_elaboracion_desarrollo.typ"
 #include "sections/4_objetivos_proyecto.typ"
-#include "sections/5_definicion_requerimientos.typ"
+// #include "sections/5_definicion_requerimientos.typ"
 #include "sections/6_analisis_situacion.typ"
 #include "sections/7_planificacion.typ"
 
