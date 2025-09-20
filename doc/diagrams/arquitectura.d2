@@ -1,0 +1,19 @@
+# dagre engine
+app: Android 15
+
+server: Servidor (Ubuntu 22.04) {
+  backend: Backend (Fast API 0.116.1)
+  model: Modelo de ML
+  firewall: Firewall
+}
+
+cloud: Google cloud {
+  db: Base de datos (Firebase)
+}
+
+# Conexiones
+app -> server.backend: HTTPS / API REST, cifrado TLS
+server.backend -> server.model: API REST / gRPC, cifrado TLS
+server.backend -> cloud.db: Conexión Firebase, usuario protegido
+server.firewall -> server
+
