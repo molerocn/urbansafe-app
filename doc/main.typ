@@ -4,7 +4,8 @@
   campus: [San Juan de Lurigancho],
   carrera: [Carrera de Ingeniería de Software],
   tipo_trabajo: [Proyecto de trabajo de investigación],
-  title: [Aplicación móvil basada en Machine Learning para optimizar la predicción de riesgos y la seguridad ciudadana en la región Callao],
+  title: [Aplicación móvil basada en Machine Learning para optimizar la
+  predicción de riesgos y la seguridad ciudadana en la región Callao],
   autores: (
     [Molero Rojas, Juan Carlos],
     [Torres Fernández, Adrian Enrique],
