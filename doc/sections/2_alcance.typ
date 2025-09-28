@@ -20,7 +20,7 @@ El proyecto se centra en la interacción de los ciudadanos con una aplicación m
 De esta manera, los usuarios pueden acceder a reportes simplificados y recibir alertas inmediatas cuando el riesgo en su entorno supera un umbral establecido, fortaleciendo la cultura de prevención y la participación ciudadana en la región del Callao.
 
 #apa-figure(
-  image("../images/diagrams/diagrama_proceso.png"),
+  image("../images/diagrama_proceso.png"),
   caption: [Diagrama de proceso (Elaboración propia)],
   label: "fig:diagrama_proceso"
 )

@@ -42,7 +42,7 @@ mindmap((Casos<br/>de uso))
         Consulta de historial
         Abrir en google maps
         Exportación de hisotrial
-    Gestión de compartir
+    Gestión de captura
         Captura de pantalla
         Compartir captura
     Gestión de usuario

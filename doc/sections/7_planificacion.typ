@@ -1,6 +1,7 @@
 #import "@local/utp-doc:1.0.0": apa-figure
 #import "../content/requerimientos.typ": (
-  reqs_funcionales, table_reqs_funcionales_1, table_reqs_funcionales_2, table_reqs_no_funcionales,
+  reqs_funcionales, table_reqs_funcionales_1, table_reqs_funcionales_2,
+table_reqs_no_funcionales, use_cases
 )
 
 = Planificación
@@ -63,37 +64,22 @@ Revisar documento diagrama_gantt.xlsx
 )
 
 == Project charter
+Revisar documento project_charter.pdf
 
 #pagebreak()
 == Sprints
 
-#apa-figure(
-  image("../images/sprint_1.png"),
-  caption: [Sprint backlog - 1 (Elaboración propia)],
-  label: "fig:sprint_1",
-)
-
-#apa-figure(
-  image("../images/sprint_2.png"),
-  caption: [Sprint backlog - 2 (Elaboración propia)],
-  label: "fig:sprint_2",
-)
-
-#apa-figure(
-  image("../images/sprint_3.png"),
-  caption: [Sprint backlog - 3 (Elaboración propia)],
-  label: "fig:sprint_3",
-)
-#pagebreak()
-
-#apa-figure(
-  image("../images/sprint_4.png"),
-  caption: [Sprint backlog - 4 (Elaboración propia)],
-  label: "fig:sprint_4",
-)
+#for i in range(1, 5) {
+  let index = str(i)
+  apa-figure(
+    image("../images/sprint_" + index + ".png"),
+    caption: [Sprint backlog - #i (Elaboración propia)],
+    label: "fig:sprint_" + index,
+  )
+}
 
 #pagebreak()
-== Historia de usuario
+== Historias de usuario
 
 #for i in range(reqs_funcionales.len()) {
   let req = reqs_funcionales.at(i)
@@ -126,5 +112,47 @@ Revisar documento diagrama_gantt.xlsx
   }
 }
 
+#include "../anexos/pila_producto.typ"
+
+#pagebreak()
+== Casos de uso
+
+#for use_case in use_cases {
+  apa-figure(
+    image("../images/diagrams/cu_gestion_" + use_case + ".png", width: 90%),
+    caption: [Caso de uso gestión "#use_case" (Elaboración propia)],
+    label: "fig:" + use_case,
+  )
+  if use_cases.last() != use_case {
+    pagebreak()
+  }
+}
+
+=== Matriz de trazabilidad
+
+#let myTable = ()
+
+#for i in range(reqs_funcionales.len()) {
+  let req = reqs_funcionales.at(i)
+  myTable.push([H#(i + 1)])
+  for use_case in use_cases {
+    if req.use_case == use_case {
+      myTable.push([X])
+    } else { myTable.push([]) }
+  }
+}
+
+#apa-figure(
+  table(
+    align: center,
+    columns: (auto, auto, auto, auto, auto, auto, auto),
+    table.header([HU], [CUS01], [CUS02], [CUS03], [CUS04], [CUS05], [CUS06]),
+    table.hline(stroke: 0.5pt),
+    ..myTable,
+    table.hline(),
+  ),
+  caption: [Matriz de trazabilidad de casos de uso (Elaboración propia)],
+  label: "tab:matriz-trazabilidad",
+)
 
 #pagebreak()
