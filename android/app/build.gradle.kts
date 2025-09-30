@@ -3,7 +3,7 @@ plugins {
 }
 
 android {
-    namespace = "com.molerocn.urbansafe"
+    namespace = "com.utp.urbansafe"
     compileSdk = 36
 
     defaultConfig {
@@ -35,6 +35,8 @@ dependencies {
 
     implementation(libs.appcompat)
     implementation(libs.material)
+    implementation(libs.activity)
+    implementation(libs.constraintlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

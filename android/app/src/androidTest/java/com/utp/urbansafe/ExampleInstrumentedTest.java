@@ -1,4 +1,4 @@
-package com.molerocn.urbansafe;
+package com.utp.urbansafe;
 
 import android.content.Context;
 
@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
     public void useAppContext() {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
-        assertEquals("com.molerocn.urbansafe", appContext.getPackageName());
+        assertEquals("com.utp.urbansafe", appContext.getPackageName());
     }
 }

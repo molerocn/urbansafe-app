@@ -1,4 +1,4 @@
-package com.molerocn.urbansafe;
+package com.utp.urbansafe;
 
 import org.junit.Test;
 
