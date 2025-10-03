@@ -36,28 +36,28 @@ Gracias a esta funcionalidad, los ciudadanos podrán conocer con antelación qu�
 == Elaboración de Prototipos 
 
 #apa-figure(
-  image("../images/prototipo_login.png", width: 80%),
+  image("../images/prototipos/prototipo_login.png", width: 80%),
   caption: [Prototipo de inicio de sesión (Elaboración propia)],
   label: "fig:prototipo_inicio_sesion"
 )
 #pagebreak()
 
 #apa-figure(
-  image("../images/prototipo_registro.png", width: 80%),
+  image("../images/prototipos/prototipo_registro.png", width: 80%),
   caption: [Prototipo de la pantalla registro (Elaboración propia)],
   label: "fig:prototipo_registro"
 )
 #pagebreak()
 
 #apa-figure(
-  image("../images/prototipo_home.png", width: 80%),
+  image("../images/prototipos/prototipo_home.png", width: 80%),
   caption: [Prototipo de la pantalla principal (Elaboración propia)],
   label: "fig:prototipo_home"
 )
 #pagebreak()
 
 #apa-figure(
-  image("../images/prototipo_calculo.png", width: 80%),
+  image("../images/prototipos/prototipo_calculo.png", width: 80%),
   caption: [Prototipo de la pantalla de cálculo de riesgo (Elaboración propia)],
   label: "fig:prototipo_calculo"
 )

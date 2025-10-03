@@ -52,3 +52,110 @@ mindmap((Casos<br/>de uso))
         Cambio de idioma
         Modo oscuro y claro
 ```
+
+# Diagrama de clase
+
+```mermaid
+classDiagram
+
+    class Usuario {
+        +int id
+        +String nombre
+        +STring correo
+        +String password
+        +registrar()
+        +iniciarSesion()
+        +iniciarSesionGoogle()
+        +cerrarSesion()
+        +recuperarContraseña()
+        +actualizarPerfil()
+    }
+    
+    class Historial {
+        +int id
+        +Datetime fecha
+        +exportarHistorial()
+        +consultarHistorial()
+        +abrirEnGoogleMaps()
+    }
+
+    class MedicionRiesgo {
+        +int id
+        +datetime hora
+        +nivelRiesgo enum ("baja", "media", "alta")
+        +capturarUbicacion()
+        +registrarHora()
+        +calcularRiesgo()
+        +mostrarRiesgo()
+    }
+
+    class Ubicacion {
+        +int id
+        +double latitud
+        +double longitud
+    }
+
+Usuario --> Historial
+Historial --> MedicionRiesgo
+MedicionRiesgo --> Ubicacion
+```
+
+# Modelado de base de datos
+
+**Modelo lógico**
+
+```mermaid
+erDiagram
+    Usuario {
+        int id_usuario PK
+        string nombre
+        string correo
+        string contraseña
+        string foto
+        string idioma
+        string tema
+    }
+
+    Sesion {
+        int id_sesion PK
+        datetime fecha_inicio
+        datetime fecha_fin
+        int id_usuario FK
+    }
+
+    Historial {
+        int id_historial PK
+        datetime fecha
+        int id_usuario FK
+    }
+
+    MedicionRiesgo {
+        int id_medicion PK
+        enum nivel_riesgo
+        datetime fecha
+        int id_historial FK
+        int id_ubicacion FK
+    }
+
+    Ubicacion {
+        int id_ubicacion PK
+        decimal latitud
+        decimal longitud
+    }
+
+    %% Relaciones
+    Usuario ||--o{ Sesion : "1:N"
+    Usuario ||--o{ Historial : "1:N"
+    Historial ||--o{ MedicionRiesgo : "1:N"
+    MedicionRiesgo ||--|| Ubicacion : "1:1"
+```
+
+
+**Modelo conceptual**
+```mermaid
+erDiagram
+    Usuario ||--o{ Sesion : "crea"
+    Usuario ||--o{ Historial : "registra"
+    Historial ||--o{ MedicionRiesgo : "almacena"
+    MedicionRiesgo ||--|| Ubicacion : "se ubica en"
+```

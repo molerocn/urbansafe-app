@@ -10,8 +10,8 @@ En ese marco, la aplicación se compone de los siguientes módulos principales:
 
 - Módulo de autenticación y gestión de usuarios: permite registrar perfiles mediante correo electrónico o Google, iniciar y cerrar sesión de forma segura, recuperar contraseñas y actualizar datos del perfil. 
 - Módulo de análisis predictivo: aplica modelos de Machine Learning para procesar los reportes ciudadanos y datos históricos, identificando patrones de inseguridad y generando mapas de riesgo. 
-- Módulo de consultas y visualización: permite capturar la ubicación del usuario, calcular el porcentaje de riesgo en un área determinada, mostrar resultados de manera clara, consultar el historial de riesgos registrados, exportar reportes en formatos (CSV o PDF) y visualizar los resultados en mapas interactivos. 
-- Módulo de alertas internas: muestra avisos dentro de la aplicación cuando el porcentaje de riesgo en una zona supera el umbral predefinido (80%), ayudando al ciudadano a identificar situaciones críticas en el momento de la consulta. 
+- Módulo de consultas y visualización: permite capturar la ubicación del usuario, calcular el nivel de riesgo en un área determinada, mostrar resultados de manera clara, consultar el historial de riesgos registrados, exportar reportes en formatos (CSV o PDF) y visualizar los resultados en mapas interactivos. 
+- Módulo de alertas internas: muestra avisos dentro de la aplicación cuando el nivel de riesgo en una zona supera el umbral predefinido (80%), ayudando al ciudadano a identificar situaciones críticas en el momento de la consulta. 
 - Módulo de personalización y accesibilidad: brinda la posibilidad de cambiar el idioma de la interfaz entre español o inglés, alternar entre los modos oscuro y claro y realizar llamadas rápidas a los números principales de emergencia desde la aplicación.
 
 == Descripción de los procesos del negocio

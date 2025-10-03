@@ -9,7 +9,6 @@ table_reqs_no_funcionales, use_cases
 == Acta de constitución del proyecto
 Revisar documento acta_constitucion.pdf
 
-// == Cronograma
 == Diagrama de Gantt
 Revisar documento diagrama_gantt.xlsx
 
@@ -128,7 +127,7 @@ Revisar documento project_charter.pdf
   }
 }
 
-=== Matriz de trazabilidad
+== Matriz de trazabilidad
 
 #let myTable = ()
 
@@ -156,3 +155,28 @@ Revisar documento project_charter.pdf
 )
 
 #pagebreak()
+
+== Sprint planning
+
+Revisar documento sprint_planning_1.pdf y sprint_planning_2.pdf
+
+== Diagrama de actividades
+
+#apa-figure(
+  image("../images/diagrams/bpmn.png"),
+  caption: [Diagrama de actividades BPMN (Elaboración propia)],
+  label: "fig:diagrama_bpmn",
+)
+
+== Modelado de la base de datos
+
+// TODO: imagenes del modelo conceptual, logico y fisico
+
+== Diagrama de clases
+
+// TODO: agregar diagrama de clase
+
+== Diagramas de secuencia
+
+// TODO: #for i in range (1, 21) {
+//}
