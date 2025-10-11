@@ -1,7 +1,6 @@
 #import "@local/utp-doc:1.0.0": apa-figure
 #import "../content/requerimientos.typ": (
-  reqs_funcionales, table_reqs_funcionales_1, table_reqs_funcionales_2,
-table_reqs_no_funcionales, use_cases
+  reqs_funcionales, table_reqs_funcionales_1, table_reqs_funcionales_2, table_reqs_no_funcionales, use_cases,
 )
 
 = Planificación
@@ -168,15 +167,54 @@ Revisar documento sprint_planning_1.pdf y sprint_planning_2.pdf
   label: "fig:diagrama_bpmn",
 )
 
+#pagebreak()
 == Modelado de la base de datos
 
-// TODO: imagenes del modelo conceptual, logico y fisico
+#apa-figure(
+  image("../images/modelo_logico.png", width: 80%),
+  caption: [Modelo lógico (Elaboración propia)],
+  label: "fig:modelo_logico",
+)
+#pagebreak()
+
+#apa-figure(
+  image("../images/modelo_conceptual.png", width: 80%),
+  caption: [Modelo conceptual (Elaboración propia)],
+  label: "fig:modelo_conceptual",
+)
+#pagebreak()
+
+#apa-figure(
+  image("../images/modelo_fisico.png", width: 80%),
+  caption: [Modelo físico (Elaboración propia)],
+  label: "fig:modelo_fisico",
+)
+#pagebreak()
+
 
 == Diagrama de clases
 
-// TODO: agregar diagrama de clase
+#apa-figure(
+  image("../images/diagrama_clases.png", width: 70%),
+  caption: [Diagrama de clases (Elaboración propia)],
+  label: "fig:diagrama_clases",
+)
+
+#pagebreak()
 
 == Diagramas de secuencia
 
-// TODO: #for i in range (1, 21) {
-//}
+#for i in range(1, 21) {
+  apa-figure(
+    image(
+      "../images/diagramas_secuencia/diagrama_" + str(i) + ".png",
+      // width: 80%,
+      height: 8cm,
+    ),
+    caption: "Diagrama de secuencia " + str(i) + " (Elaboración propia)",
+    label: "fig:diagrama_secuencia_" + str(i),
+  )
+  if calc.even(i) {
+    pagebreak()
+  }
+}

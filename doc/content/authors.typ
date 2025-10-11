@@ -5,4 +5,3 @@
   "Barreto Velasquez, Johan Alejandro",
   "Ramos Verano, Wilmer Alexander",
 )
-
