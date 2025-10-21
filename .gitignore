@@ -1,0 +1,5 @@
+*/images/diagrams/
+*.bkp
+build/
+*.pdf
+
