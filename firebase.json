@@ -1,0 +1,28 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "urbansafe-app01",
+          "appId": "1:784554507077:android:f8abeaadee245c011a1c2c",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "urbansafe-app01",
+          "configurations": {
+            "android": "1:784554507077:android:f8abeaadee245c011a1c2c",
+            "ios": "1:784554507077:ios:7ae0d83ecb8d185d1a1c2c",
+            "macos": "1:784554507077:ios:7ae0d83ecb8d185d1a1c2c",
+            "web": "1:784554507077:web:95598ad506fb02091a1c2c",
+            "windows": "1:784554507077:web:6fd7626614090a921a1c2c"
+          }
+        }
+      }
+    }
+  },
+  "firestore": {
+    "indexes": "firestore.indexes.json"
+  }
+}

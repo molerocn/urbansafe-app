@@ -1,0 +1,14 @@
+{
+  "indexes": [
+    {
+      "collectionId": "mediciones",
+      "collectionGroup": "mediciones",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "userId", "order": "ASCENDING" },
+        { "fieldPath": "fecha", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

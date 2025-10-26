@@ -41,6 +41,10 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<!-- Permission description for location access. Shown to the user when the app
+	     requests location while in use. Provide a short explanation in Spanish. -->
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>Usamos tu ubicación para guardar mediciones de riesgo automáticamente cuando abres la aplicación.</string>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
