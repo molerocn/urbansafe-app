@@ -1,4 +1,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Location permissions required for geolocation (geolocator plugin).
+         ACCESS_FINE_LOCATION grants precise location. ACCESS_COARSE_LOCATION
+         grants approximate location. We request them so the OS can prompt the user
+         and the plugin can return coordinates. -->
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <application
         android:label="urbansafe"
         android:name="${applicationName}"

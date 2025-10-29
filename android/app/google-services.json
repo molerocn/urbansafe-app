@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "784554507077",
+    "project_id": "urbansafe-app01",
+    "storage_bucket": "urbansafe-app01.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:784554507077:android:f8abeaadee245c011a1c2c",
+        "android_client_info": {
+          "package_name": "com.example.urbansafe"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCgHYCi-saYkBkVS_PMt_YaPXdn0CO6BGo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
