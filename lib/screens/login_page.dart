@@ -5,6 +5,9 @@ import 'dart:math';
 import '../src/app_constants.dart';
 import 'package:flutter/material.dart';
 
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
+import 'package:google_sign_in/google_sign_in.dart';
+
 import '../models/user.dart';
 import '../src/auth/hash.dart';
 import 'register_page.dart';
@@ -117,6 +120,83 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future<void> _signInWithGoogle() async {
+    setState(() {
+      _error = null;
+      _loading = true;
+    });
+
+    try {
+      final GoogleSignInAccount? account = await GoogleSignIn().signIn();
+      if (account == null) return; // usuario canceló
+
+      final googleAuth = await account.authentication;
+      final credential = fb_auth.GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      final userCred = await fb_auth.FirebaseAuth.instance
+          .signInWithCredential(credential);
+
+      final email = userCred.user?.email;
+      final displayName = userCred.user?.displayName ?? '';
+      if (email == null || email.isEmpty) {
+        setState(() => _error = 'No se pudo obtener el correo de la cuenta Google.');
+        return;
+      }
+
+      final q = await FirebaseFirestore.instance
+          .collection('users')
+          .where('correo', isEqualTo: email)
+          .limit(1)
+          .get();
+
+      DocumentSnapshot doc;
+      if (q.docs.isNotEmpty) {
+        doc = q.docs.first;
+      } else {
+        final newUserMap = {
+          'nombre': displayName,
+          'correo': email,
+          'rol': 'Usuario',
+          'createdAt': FieldValue.serverTimestamp(),
+        };
+        final ref = await FirebaseFirestore.instance.collection('users').add(newUserMap);
+        doc = await ref.get();
+      }
+
+      final user = User.fromDoc(doc);
+
+      if (!mounted) return;
+
+      final token = '${DateTime.now().millisecondsSinceEpoch}-${Random().nextInt(1 << 32)}';
+      final expiry = DateTime.now().toUtc().add(Duration(minutes: kSessionTokenTtlMinutes));
+
+      try {
+        await FirebaseFirestore.instance.collection('users').doc(user.id).update({
+          'sessionToken': token,
+          'sessionTokenExpiry': Timestamp.fromDate(expiry),
+        });
+      } catch (_) {}
+
+      try {
+        final prefs = await SharedPreferences.getInstance();
+        await prefs.setString(kSessionUserIdKey, user.id ?? '');
+        await prefs.setString(kSessionTokenKey, token);
+      } catch (_) {}
+
+      if (!mounted) return;
+      Navigator.of(context).pushReplacement(MaterialPageRoute(builder: (_) => HomePage(user: user)));
+    } on FirebaseException catch (fe) {
+      setState(() => _error = 'Error con Firebase: ${fe.message ?? fe.code}');
+    } catch (e) {
+      setState(() => _error = 'Error iniciando sesión con Google: $e');
+    } finally {
+      if (mounted) setState(() => _loading = false);
+    }
+  }
+
   @override
   void dispose() {
     _userController.dispose();
@@ -153,17 +233,27 @@ class _LoginPageState extends State<LoginPage> {
             const SizedBox(height: 8),
             _loading
                 ? const CircularProgressIndicator()
-                : ElevatedButton(
-                    onPressed: _loginWithFirestore,
-                    child: const Text('Entrar'),
+                : Column(
+                    children: [
+                      ElevatedButton(
+                        onPressed: _loginWithFirestore,
+                        child: const Text('Entrar'),
+                      ),
+                      const SizedBox(height: 8),
+                      OutlinedButton.icon(
+                        onPressed: _signInWithGoogle,
+                        icon: const Icon(Icons.login),
+                        label: const Text('Continuar con Google'),
+                      ),
+                      const SizedBox(height: 8),
+                      TextButton(
+                        onPressed: () => Navigator.of(
+                          context,
+                        ).push(MaterialPageRoute(builder: (_) => const RegisterPage())),
+                        child: const Text('Crear cuenta'),
+                      ),
+                    ],
                   ),
-            const SizedBox(height: 8),
-            TextButton(
-              onPressed: () => Navigator.of(
-                context,
-              ).push(MaterialPageRoute(builder: (_) => const RegisterPage())),
-              child: const Text('Crear cuenta'),
-            ),
           ],
         ),
       ),

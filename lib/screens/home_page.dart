@@ -1,4 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'dart:ui' as ui;
+import 'dart:typed_data';
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:flutter/rendering.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
@@ -26,6 +33,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final GlobalKey _screenshotKey = GlobalKey();
   final MedicionRepository _repo = MedicionRepository();
   bool _saved = false;
   bool _loading = false;
@@ -321,7 +329,9 @@ class _HomePageState extends State<HomePage> {
               child: Center(
                 child: _loading
                     ? const CircularProgressIndicator()
-                    : Column(
+                    : RepaintBoundary(
+                        key: _screenshotKey,
+                        child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Text(
@@ -367,6 +377,7 @@ class _HomePageState extends State<HomePage> {
                       ),
               ),
             ),
+            ),
             Padding(
               padding: const EdgeInsets.only(bottom: 28.0),
               child: Row(
@@ -376,7 +387,7 @@ class _HomePageState extends State<HomePage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () => _showEmergencyNumbers(context),
                         icon: const Icon(Icons.call, size: 28),
                       ),
                       const SizedBox(height: 6),
@@ -387,7 +398,7 @@ class _HomePageState extends State<HomePage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        onPressed: () {},
+                        onPressed: () => _showShareModal(context),
                         icon: const Icon(Icons.share, size: 28),
                       ),
                       const SizedBox(height: 6),
@@ -401,5 +412,124 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
     );
+  }
+
+  Future<File?> _captureAndSavePng() async {
+    try {
+      final boundary = _screenshotKey.currentContext?.findRenderObject()
+          as RenderRepaintBoundary?;
+      if (boundary == null) return null;
+      final view = WidgetsBinding.instance.platformDispatcher.views.first;
+      final ui.Image image = await boundary.toImage(pixelRatio: view.devicePixelRatio);
+      final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData == null) return null;
+      final Uint8List pngBytes = byteData.buffer.asUint8List();
+      final dir = await getTemporaryDirectory();
+      final file = File('${dir.path}/screenshot_${DateTime.now().millisecondsSinceEpoch}.png');
+      await file.writeAsBytes(pngBytes);
+      return file;
+    } catch (e) {
+      // ignore: avoid_print
+      print('Error capturing screenshot: $e');
+      return null;
+    }
+  }
+
+  void _showShareModal(BuildContext context) async {
+    final file = await _captureAndSavePng();
+    if (file == null) {
+      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('No se pudo generar la captura.')),
+      );
+      return;
+    }
+
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12.0),
+              child: Text(
+                'Compartir captura',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12.0),
+              child: Image.file(file, height: 240),
+            ),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                ElevatedButton.icon(
+                  onPressed: () async {
+                    await Share.shareXFiles([XFile(file.path)], text: 'Nivel: ${_riskLabel}\nScore: ${_riskValue.toStringAsFixed(2)}');
+                    Navigator.of(context).pop();
+                  },
+                  icon: const Icon(Icons.share),
+                  label: const Text('Compartir'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  child: const Text('Cerrar'),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showEmergencyNumbers(BuildContext context) {
+    final numbers = <Map<String, String>>[
+      {'label': 'Serenazgo', 'number': '+51123456789'},
+      {'label': 'Ambulancia', 'number': '+51123456790'},
+      {'label': 'Policía', 'number': '+51123456791'},
+    ];
+
+    showModalBottomSheet<void>(
+      context: context,
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Padding(
+              padding: EdgeInsets.symmetric(vertical: 12.0),
+              child: Text(
+                'Números de emergencia',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+            ...numbers.map((item) => ListTile(
+                  leading: const Icon(Icons.phone),
+                  title: Text(item['label'] ?? ''),
+                  subtitle: Text(item['number'] ?? ''),
+                  onTap: () {
+                    final num = item['number'] ?? '';
+                    _launchPhone(num);
+                  },
+                )),
+            const SizedBox(height: 8),
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: const Text('Cerrar'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Future<void> _launchPhone(String phoneNumber) async {
+    final uri = Uri.parse('tel:$phoneNumber');
+    if (!await launchUrl(uri)) {
+      // ignore: avoid_print
+      print('No se pudo abrir el marcador para $phoneNumber');
+    }
   }
 }
