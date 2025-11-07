@@ -12,7 +12,28 @@
           "package_name": "com.example.urbansafe"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "784554507077-6kr1jqt81hm6gbug73g3l7asepbeteef.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.urbansafe",
+            "certificate_hash": "51a2cacda153ba3bb234b8eb22442557b6c7b22c"
+          }
+        },
+        {
+          "client_id": "784554507077-bnbpoprih7r8p061ifmsktrrtfi17i4o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.urbansafe",
+            "certificate_hash": "0e885f1cf9298bc384bf24dbc6c2a9f1003f4455"
+          }
+        },
+        {
+          "client_id": "784554507077-rvgkit3s4p6tq5n0oi3kd4pptcol8cbc.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyCgHYCi-saYkBkVS_PMt_YaPXdn0CO6BGo"
@@ -20,7 +41,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "784554507077-rvgkit3s4p6tq5n0oi3kd4pptcol8cbc.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "784554507077-tvuqqrlajp737aaffuh20osh3rv02j5k.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.urbansafe"
+              }
+            }
+          ]
         }
       }
     }
