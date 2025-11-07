@@ -50,16 +50,29 @@ Gracias a esta funcionalidad, los ciudadanos podrán conocer con antelación qu�
 #pagebreak()
 
 #apa-figure(
-  image("../images/prototipos/prototipo_home.png", width: 80%),
+  image("../images/prototipos/prototipo_home.png", width: 70%),
   caption: [Prototipo de la pantalla principal (Elaboración propia)],
   label: "fig:prototipo_home"
 )
 #pagebreak()
 
 #apa-figure(
-  image("../images/prototipos/prototipo_calculo.png", width: 80%),
-  caption: [Prototipo de la pantalla de cálculo de riesgo (Elaboración propia)],
-  label: "fig:prototipo_calculo"
+  image("../images/prototipos/prototipo_historial.png", width: 70%),
+  caption: [Prototipo de la pantalla de historial (Elaboración propia)],
+  label: "fig:prototipo_historial"
 )
+
+#apa-figure(
+  image("../images/prototipos/prototipo_compartir.png", width: 70%),
+  caption: [Prototipo de la pantalla de compartir (Elaboración propia)],
+  label: "fig:prototipo_compartir"
+)
+
+#apa-figure(
+  image("../images/prototipos/prototipo_emergencia.png", width: 70%),
+  caption: [Prototipo de la pantalla de emergencia (Elaboración propia)],
+  label: "fig:prototipo_emergencia"
+)
+
 
 #pagebreak()
