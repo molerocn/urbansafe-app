@@ -63,6 +63,7 @@ classDiagram
         +String nombre
         +STring correo
         +String password
+        +rol enum ("admi", "user")
         +registrar()
         +iniciarSesion()
         +iniciarSesionGoogle()
@@ -111,6 +112,7 @@ erDiagram
         string nombre
         string correo
         string contraseña
+        enum rol
         string foto
         string idioma
         string tema
