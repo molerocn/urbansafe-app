@@ -107,7 +107,7 @@ class _RegisterPageState extends State<RegisterPage> {
                   fit: BoxFit.cover,
                 ),
 
-                // Efecto de degradado (oscuro arriba, transparente abajo)
+                // Opacidad de la imagen
                 Container(
                   width: double.infinity,
                   height: 220,
@@ -221,7 +221,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
                     const SizedBox(height: 16),
 
-                    // 🔹 Botón azul de registro
+                    // Boton de register
                     _loading
                         ? const CircularProgressIndicator()
                         : SizedBox(
