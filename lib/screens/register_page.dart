@@ -96,7 +96,7 @@ class _RegisterPageState extends State<RegisterPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // 🔹 Imagen superior con efecto de desvanecimiento
+            // 
             Stack(
               children: [
                 // Imagen de fondo
@@ -157,7 +157,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
             const SizedBox(height: 30),
 
-            // 🔹 Formulario de registro
+            // 
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Form(
@@ -259,7 +259,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  /// 🔹 Campo reutilizable
+  /// 
   Widget _buildField({
     required TextEditingController controller,
     required String label,
