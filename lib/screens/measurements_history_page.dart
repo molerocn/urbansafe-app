@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/risk_measurement.dart';
 import '../models/user.dart';
 import '../repositories/measurement_repository.dart';
+import '../services/export_service.dart';
 
 /// Página que muestra el historial de mediciones de riesgo de un usuario.
 class MeasurementsHistoryPage extends StatefulWidget {
@@ -95,6 +96,62 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
     }
   }
 
+  // Exporta el historial a CSV
+  Future<void> _exportToCSV() async {
+    try {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Generando archivo CSV...')));
+
+      final filePath = await ExportService.exportToCSV(_items);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('CSV generado correctamente'),
+            action: SnackBarAction(
+              label: 'Compartir',
+              onPressed: () => ExportService.shareFile(filePath),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error al exportar: $e')));
+      }
+    }
+  }
+
+  // Exporta el historial a PDF
+  Future<void> _exportToPDF() async {
+    try {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Generando archivo PDF...')));
+
+      final filePath = await ExportService.exportToPDF(_items);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: const Text('PDF generado correctamente'),
+            action: SnackBarAction(
+              label: 'Compartir',
+              onPressed: () => ExportService.shareFile(filePath),
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text('Error al exportar: $e')));
+      }
+    }
+  }
+
   // Construye la interfaz de usuario para la página de historial de mediciones.
   @override
   Widget build(BuildContext context) {
@@ -112,6 +169,26 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
+                // Barra de herramientas de exportación
+                if (_items.isNotEmpty)
+                  Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        ElevatedButton.icon(
+                          onPressed: _exportToCSV,
+                          icon: const Icon(Icons.file_download),
+                          label: const Text('Descargar CSV'),
+                        ),
+                        ElevatedButton.icon(
+                          onPressed: _exportToPDF,
+                          icon: const Icon(Icons.picture_as_pdf),
+                          label: const Text('Descargar PDF'),
+                        ),
+                      ],
+                    ),
+                  ),
                 Expanded(
                   child: ListView.separated(
                     itemCount: _items.length,
