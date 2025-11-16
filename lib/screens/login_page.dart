@@ -37,8 +37,8 @@ class _LoginPageState extends State<LoginPage> {
         _error = (email.isEmpty && password.isEmpty)
             ? AppTranslations.get('email_password_required', lang)
             : (email.isEmpty
-                ? AppTranslations.get('email_required', lang)
-                : AppTranslations.get('password_required', lang));
+                  ? AppTranslations.get('email_required', lang)
+                  : AppTranslations.get('password_required', lang));
       });
       return;
     }
@@ -73,7 +73,9 @@ class _LoginPageState extends State<LoginPage> {
 
       final inputHash = hashPassword(password, email);
       if (inputHash != storedHash) {
-        setState(() => _error = AppTranslations.get('incorrect_password', lang));
+        setState(
+          () => _error = AppTranslations.get('incorrect_password', lang),
+        );
         return;
       }
 
@@ -83,10 +85,7 @@ class _LoginPageState extends State<LoginPage> {
         Duration(minutes: kSessionTokenTtlMinutes),
       );
 
-      await FirebaseFirestore.instance
-          .collection('users')
-          .doc(user.id)
-          .update({
+      await FirebaseFirestore.instance.collection('users').doc(user.id).update({
         'sessionToken': token,
         'sessionTokenExpiry': Timestamp.fromDate(expiry),
       });
@@ -100,7 +99,9 @@ class _LoginPageState extends State<LoginPage> {
         MaterialPageRoute(builder: (_) => HomePage(user: user)),
       );
     } catch (e) {
-      setState(() => _error = '${AppTranslations.get('login_error', lang)}: $e');
+      setState(
+        () => _error = '${AppTranslations.get('login_error', lang)}: $e',
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -117,13 +118,10 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final localization = context.watch<LocalizationService>();
     final lang = localization.currentLanguageCode;
-    
+
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-      ),
+      appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -157,8 +155,13 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          lang == 'es' ? "prioriza tu seguridad" : "prioritize your safety",
-                          style: const TextStyle(color: Colors.white, fontSize: 14),
+                          lang == 'es'
+                              ? "prioriza tu seguridad"
+                              : "prioritize your safety",
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                          ),
                         ),
                       ],
                     ),
@@ -207,10 +210,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
 
                   if (_error != null)
-                    Text(
-                      _error!,
-                      style: const TextStyle(color: Colors.red),
-                    ),
+                    Text(_error!, style: const TextStyle(color: Colors.red)),
 
                   const SizedBox(height: 20),
 
@@ -227,8 +227,7 @@ class _LoginPageState extends State<LoginPage> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 14),
+                              padding: const EdgeInsets.symmetric(vertical: 14),
                             ),
                             child: Text(
                               AppTranslations.get('login_button', lang),
@@ -352,8 +351,9 @@ class _LoginPageState extends State<LoginPage> {
         idToken: googleAuth.idToken,
       );
 
-      final userCred = await fb_auth.FirebaseAuth.instance
-          .signInWithCredential(credential);
+      final userCred = await fb_auth.FirebaseAuth.instance.signInWithCredential(
+        credential,
+      );
       final email = userCred.user?.email;
       final displayName = userCred.user?.displayName ?? '';
       if (email == null || email.isEmpty) return;
@@ -374,7 +374,9 @@ class _LoginPageState extends State<LoginPage> {
           'rol': 'Usuario',
           'createdAt': FieldValue.serverTimestamp(),
         };
-        final ref = await FirebaseFirestore.instance.collection('users').add(newUserMap);
+        final ref = await FirebaseFirestore.instance
+            .collection('users')
+            .add(newUserMap);
         doc = await ref.get();
       }
 
