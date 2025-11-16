@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:provider/provider.dart';
 import '../models/risk_measurement.dart';
 import '../models/user.dart';
 import '../repositories/measurement_repository.dart';
 import '../services/export_service.dart';
+import '../services/localization_service.dart';
+import '../src/app_translations.dart';
 
 /// Página que muestra el historial de mediciones de riesgo de un usuario.
 class MeasurementsHistoryPage extends StatefulWidget {
@@ -61,10 +64,11 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
   }
 
   // Formatea la fecha de la medición para mostrarla en la lista.
-  String _formatDate(Timestamp? ts) {
-    if (ts == null) return 'Fecha pendiente';
+  String _formatDate(Timestamp? ts, String languageCode) {
+    if (ts == null) return AppTranslations.get('date', languageCode);
     final dt = ts.toDate();
-    return DateFormat('dd/MM/yyyy HH:mm').format(dt);
+    final pattern = AppTranslations.get('date_format', languageCode);
+    return DateFormat(pattern).format(dt);
   }
 
   // Carga una página de mediciones desde Firestore.
@@ -97,19 +101,19 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
   }
 
   // Exporta el historial a CSV
-  Future<void> _exportToCSV() async {
+  Future<void> _exportToCSV(String lang) async {
     try {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Generando archivo CSV...')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppTranslations.get('loading', lang))),
+      );
 
       final filePath = await ExportService.exportToCSV(_items);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('CSV generado correctamente'),
+            content: Text(AppTranslations.get('export_success', lang)),
             action: SnackBarAction(
-              label: 'Compartir',
+              label: AppTranslations.get('share_button', lang),
               onPressed: () => ExportService.shareFile(filePath),
             ),
           ),
@@ -117,27 +121,29 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error al exportar: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${AppTranslations.get('export_error', lang)}: $e'),
+          ),
+        );
       }
     }
   }
 
   // Exporta el historial a PDF
-  Future<void> _exportToPDF() async {
+  Future<void> _exportToPDF(String lang) async {
     try {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text('Generando archivo PDF...')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(AppTranslations.get('loading', lang))),
+      );
 
       final filePath = await ExportService.exportToPDF(_items);
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('PDF generado correctamente'),
+            content: Text(AppTranslations.get('export_success', lang)),
             action: SnackBarAction(
-              label: 'Compartir',
+              label: AppTranslations.get('share_button', lang),
               onPressed: () => ExportService.shareFile(filePath),
             ),
           ),
@@ -145,9 +151,11 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(SnackBar(content: Text('Error al exportar: $e')));
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('${AppTranslations.get('export_error', lang)}: $e'),
+          ),
+        );
       }
     }
   }
@@ -155,16 +163,18 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
   // Construye la interfaz de usuario para la página de historial de mediciones.
   @override
   Widget build(BuildContext context) {
+    final localization = context.watch<LocalizationService>();
+    final lang = localization.currentLanguageCode;
     final uid = widget.user.id;
     if (uid == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Historial de mediciones')),
-        body: const Center(child: Text('Usuario no identificado')),
+        appBar: AppBar(title: Text(AppTranslations.get('history_title', lang))),
+        body: Center(child: Text(AppTranslations.get('welcome', lang))),
       );
     }
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Historial de mediciones')),
+      appBar: AppBar(title: Text(AppTranslations.get('history_title', lang))),
       body: _items.isEmpty && _loading
           ? const Center(child: CircularProgressIndicator())
           : Column(
@@ -177,64 +187,79 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         ElevatedButton.icon(
-                          onPressed: _exportToCSV,
+                          onPressed: () => _exportToCSV(lang),
                           icon: const Icon(Icons.file_download),
-                          label: const Text('Descargar CSV'),
+                          label: Text(AppTranslations.get('export_csv', lang)),
                         ),
                         ElevatedButton.icon(
-                          onPressed: _exportToPDF,
+                          onPressed: () => _exportToPDF(lang),
                           icon: const Icon(Icons.picture_as_pdf),
-                          label: const Text('Descargar PDF'),
+                          label: const Text('PDF'),
                         ),
                       ],
                     ),
                   ),
                 Expanded(
-                  child: ListView.separated(
-                    itemCount: _items.length,
-                    separatorBuilder: (_, __) => const Divider(height: 1),
-                    itemBuilder: (context, index) {
-                      final m = _items[index];
-                      final label =
-                          m.nivelRiesgoLabel ?? m.nivelRiesgo.toString();
-                      return ListTile(
-                        leading: _iconForMedicion(m),
-                        title: Text(label),
-                        subtitle: Text(_formatDate(m.fecha)),
-                        trailing: Text(m.user?['nombre'] ?? ''),
-                        onTap: () {
-                          showDialog(
-                            context: context,
-                            builder: (_) => AlertDialog(
-                              title: Text('Medición - $label'),
-                              content: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text('Nivel: $label'),
-                                  const SizedBox(height: 8),
-                                  Text('Fecha: ${_formatDate(m.fecha)}'),
-                                  if (m.ubicacionLat != null &&
-                                      m.ubicacionLng != null) ...[
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      'Ubicación: ${m.ubicacionLat}, ${m.ubicacionLng}',
+                  child: _items.isEmpty
+                      ? Center(
+                          child: Text(
+                            AppTranslations.get('no_measurements', lang),
+                          ),
+                        )
+                      : ListView.separated(
+                          itemCount: _items.length,
+                          separatorBuilder: (_, __) => const Divider(height: 1),
+                          itemBuilder: (context, index) {
+                            final m = _items[index];
+                            final label =
+                                m.nivelRiesgoLabel ?? m.nivelRiesgo.toString();
+                            return ListTile(
+                              leading: _iconForMedicion(m),
+                              title: Text(label),
+                              subtitle: Text(_formatDate(m.fecha, lang)),
+                              trailing: Text(m.user?['nombre'] ?? ''),
+                              onTap: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (_) => AlertDialog(
+                                    title: Text(
+                                      '${AppTranslations.get('risk_level', lang)} - $label',
                                     ),
-                                  ],
-                                ],
-                              ),
-                              actions: [
-                                TextButton(
-                                  onPressed: () => Navigator.pop(context),
-                                  child: const Text('Cerrar'),
-                                ),
-                              ],
-                            ),
-                          );
-                        },
-                      );
-                    },
-                  ),
+                                    content: Column(
+                                      mainAxisSize: MainAxisSize.min,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          '${AppTranslations.get('risk_level', lang)}: $label',
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          '${AppTranslations.get('date', lang)}: ${_formatDate(m.fecha, lang)}',
+                                        ),
+                                        if (m.ubicacionLat != null &&
+                                            m.ubicacionLng != null) ...[
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            '${AppTranslations.get('location', lang)}: ${m.ubicacionLat}, ${m.ubicacionLng}',
+                                          ),
+                                        ],
+                                      ],
+                                    ),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(context),
+                                        child: Text(
+                                          AppTranslations.get('close', lang),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
                 ),
                 if (_hasMore)
                   Padding(
@@ -243,14 +268,14 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
                         ? const CircularProgressIndicator()
                         : ElevatedButton(
                             onPressed: _loadPage,
-                            child: const Text('Cargar más'),
+                            child: Text(AppTranslations.get('load_more', lang)),
                           ),
                   ),
                 if (!_hasMore)
                   Padding(
                     padding: const EdgeInsets.all(12.0),
                     child: Text(
-                      'No hay más mediciones',
+                      AppTranslations.get('no_measurements', lang),
                       style: Theme.of(context).textTheme.bodySmall,
                     ),
                   ),

@@ -22,17 +22,19 @@ class ExportService {
           'Hora',
           'Latitud',
           'Longitud',
-          'Usuario'
-        ]
+          'Usuario',
+        ],
       ];
 
       // Agregar datos de cada medición
       for (final measurement in measurements) {
         final fecha = measurement.fecha?.toDate();
-        final fechaFormateada =
-            fecha != null ? DateFormat('dd/MM/yyyy').format(fecha) : 'N/A';
-        final horaFormateada =
-            fecha != null ? DateFormat('HH:mm:ss').format(fecha) : 'N/A';
+        final fechaFormateada = fecha != null
+            ? DateFormat('dd/MM/yyyy').format(fecha)
+            : 'N/A';
+        final horaFormateada = fecha != null
+            ? DateFormat('HH:mm:ss').format(fecha)
+            : 'N/A';
         final usuario = measurement.user?['nombre'] ?? 'Desconocido';
 
         csvData.add([
@@ -152,10 +154,12 @@ class ExportService {
     // Datos
     for (final measurement in measurements) {
       final fecha = measurement.fecha?.toDate();
-      final fechaFormateada =
-          fecha != null ? DateFormat('dd/MM/yyyy').format(fecha) : 'N/A';
-      final horaFormateada =
-          fecha != null ? DateFormat('HH:mm').format(fecha) : 'N/A';
+      final fechaFormateada = fecha != null
+          ? DateFormat('dd/MM/yyyy').format(fecha)
+          : 'N/A';
+      final horaFormateada = fecha != null
+          ? DateFormat('HH:mm').format(fecha)
+          : 'N/A';
       final usuario = measurement.user?['nombre'] ?? 'Desconocido';
       final ubicacion =
           '${measurement.ubicacionLat?.toStringAsFixed(2) ?? 'N/A'}, ${measurement.ubicacionLng?.toStringAsFixed(2) ?? 'N/A'}';
@@ -197,10 +201,10 @@ class ExportService {
     try {
       final file = File(filePath);
       final fileName = file.path.split('/').last;
-      await Share.shareXFiles(
-        [XFile(filePath)],
-        subject: 'Historial de Riesgos - $fileName',
-      );
+      // ignore: deprecated_member_use
+      await Share.shareXFiles([
+        XFile(filePath),
+      ], subject: 'Historial de Riesgos - $fileName');
     } catch (e) {
       throw Exception('Error al compartir archivo: $e');
     }
