@@ -8,6 +8,7 @@ import '../repositories/measurement_repository.dart';
 import '../services/export_service.dart';
 import '../services/localization_service.dart';
 import '../src/app_translations.dart';
+import 'history_map_page.dart'; // Importa la nueva página del mapa
 
 /// Página que muestra el historial de mediciones de riesgo de un usuario.
 class MeasurementsHistoryPage extends StatefulWidget {
@@ -174,7 +175,23 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
     }
 
     return Scaffold(
-      appBar: AppBar(title: Text(AppTranslations.get('history_title', lang))),
+      appBar: AppBar(
+        title: Text(AppTranslations.get('history_title', lang)),
+        actions: [
+          if (_items.isNotEmpty) // Solo muestra el botón si hay mediciones
+            IconButton(
+              icon: const Icon(Icons.map_outlined),
+              tooltip: 'Ver en mapa', // TODO: Internacionalizar
+              onPressed: () {
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (_) => HistoryMapPage(measurements: _items),
+                  ),
+                );
+              },
+            ),
+        ],
+      ),
       body: _items.isEmpty && _loading
           ? const Center(child: CircularProgressIndicator())
           : Column(
@@ -227,8 +244,7 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
                                     ),
                                     content: Column(
                                       mainAxisSize: MainAxisSize.min,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
+                                      crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
                                           '${AppTranslations.get('risk_level', lang)}: $label',

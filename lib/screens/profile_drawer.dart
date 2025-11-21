@@ -3,12 +3,15 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 
 import '../models/user.dart';
 import '../src/app_constants.dart';
 import '../src/app_logger.dart';
+import '../src/app_translations.dart';
+import '../services/localization_service.dart';
 import '../src/theme_service.dart';
 import 'login_page.dart';
 
@@ -53,7 +56,7 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
     }
   }
 
-  Future<void> _saveProfile() async {
+  Future<void> _saveProfile(String lang) async {
     if (widget.user.id == null) return;
 
     setState(() => _isSaving = true);
@@ -81,13 +84,13 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Perfil actualizado con éxito'), backgroundColor: Colors.green),
+          SnackBar(content: Text(AppTranslations.get('profile_updated', lang)), backgroundColor: Colors.green),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error al actualizar el perfil: $e'), backgroundColor: Colors.red),
+          SnackBar(content: Text('${AppTranslations.get('profile_update_error', lang)}: $e'), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -135,19 +138,21 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final localization = context.watch<LocalizationService>();
+    final lang = localization.currentLanguageCode;
 
     return Drawer(
       child: ListView(
         padding: EdgeInsets.zero,
         children: <Widget>[
           _buildHeader(context, textTheme),
-          _buildProfileForm(textTheme),
+          _buildProfileForm(textTheme, lang),
           const Divider(),
           ValueListenableBuilder<ThemeMode>(
             valueListenable: ThemeService.themeModeNotifier,
             builder: (context, currentMode, child) {
               return SwitchListTile(
-                title: const Text('Modo oscuro'),
+                title: Text(AppTranslations.get('dark_mode', lang)),
                 value: currentMode == ThemeMode.dark,
                 onChanged: (isDark) {
                   ThemeService.toggleTheme();
@@ -159,8 +164,13 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
             },
           ),
           ListTile(
+            leading: const Icon(Icons.language),
+            title: Text(AppTranslations.get('change_language', lang)),
+            onTap: () async => await localization.toggleLanguage(),
+          ),
+          ListTile(
             leading: const Icon(Icons.logout),
-            title: const Text('Cerrar sesión'),
+            title: Text(AppTranslations.get('logout', lang)),
             onTap: _logout,
           ),
         ],
@@ -211,50 +221,50 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
     );
   }
 
-  Widget _buildProfileForm(TextTheme textTheme) {
+  Widget _buildProfileForm(TextTheme textTheme, String lang) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          Text('Editar Perfil', style: textTheme.titleLarge),
+          Text(AppTranslations.get('edit_profile', lang), style: textTheme.titleLarge),
           const SizedBox(height: 24),
           TextFormField(
             controller: _nameController,
-            decoration: const InputDecoration(labelText: 'Nombre'),
+            decoration: InputDecoration(labelText: AppTranslations.get('name', lang)),
             enabled: _isEditing,
           ),
           const SizedBox(height: 12),
           TextFormField(
             initialValue: widget.user.correo,
-            decoration: const InputDecoration(labelText: 'Correo (no editable)'),
+            decoration: InputDecoration(labelText: AppTranslations.get('email_non_editable', lang)),
             enabled: false,
           ),
           const SizedBox(height: 24),
           Center(
             child: _isSaving
               ? const CircularProgressIndicator()
-              : (_isEditing ? _buildSaveCancelButtons() : _buildEditButton()),
+              : (_isEditing ? _buildSaveCancelButtons(lang) : _buildEditButton(lang)),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildEditButton() {
+  Widget _buildEditButton(String lang) {
     return ElevatedButton.icon(
       icon: const Icon(Icons.edit),
-      label: const Text('Editar'),
+      label: Text(AppTranslations.get('edit', lang)),
       onPressed: () => setState(() => _isEditing = true),
     );
   }
 
-  Widget _buildSaveCancelButtons() {
+  Widget _buildSaveCancelButtons(String lang) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
         TextButton(
-          child: const Text('Cancelar'),
+          child: Text(AppTranslations.get('cancel', lang)),
           onPressed: () {
             setState(() {
               _isEditing = false;
@@ -264,8 +274,8 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
           },
         ),
         ElevatedButton(
-          onPressed: _saveProfile,
-          child: const Text('Guardar'),
+          onPressed: () => _saveProfile(lang),
+          child: Text(AppTranslations.get('save', lang)),
         ),
       ],
     );
