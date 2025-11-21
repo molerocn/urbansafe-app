@@ -6,6 +6,7 @@ class User {
   final String nombre;
   final String correo;
   final String rol;
+  final String? photoUrl; // Nuevo campo para la foto de perfil
   final String? passwordHash;
   final Timestamp? createdAt;
 
@@ -14,6 +15,7 @@ class User {
     required this.nombre,
     required this.correo,
     this.rol = 'Usuario',
+    this.photoUrl,
     this.passwordHash,
     this.createdAt,
   });
@@ -26,6 +28,7 @@ class User {
       nombre: (data['nombre'] as String?) ?? '',
       correo: (data['correo'] as String?) ?? '',
       rol: (data['rol'] as String?) ?? 'Usuario',
+      photoUrl: data['photoUrl'] as String?,
       passwordHash: data['passwordHash'] as String?,
       createdAt: data['createdAt'] as Timestamp?,
     );
@@ -37,13 +40,19 @@ class User {
     nombre: (json['nombre'] as String?) ?? '',
     correo: (json['correo'] as String?) ?? '',
     rol: (json['rol'] as String?) ?? 'Usuario',
+    photoUrl: json['photoUrl'] as String?,
     passwordHash: json['passwordHash'] as String?,
     createdAt: json['createdAt'] as Timestamp?,
   );
 
   /// Convierte la entidad a un mapa listo para Firestore.
   Map<String, dynamic> toJson() {
-    final m = <String, dynamic>{'nombre': nombre, 'correo': correo, 'rol': rol};
+    final m = <String, dynamic>{
+      'nombre': nombre,
+      'correo': correo,
+      'rol': rol,
+    };
+    if (photoUrl != null) m['photoUrl'] = photoUrl;
     if (passwordHash != null) m['passwordHash'] = passwordHash;
     if (createdAt != null) m['createdAt'] = createdAt;
     return m;
@@ -55,6 +64,7 @@ class User {
     String? nombre,
     String? correo,
     String? rol,
+    String? photoUrl,
     String? passwordHash,
     Timestamp? createdAt,
   }) {
@@ -63,6 +73,7 @@ class User {
       nombre: nombre ?? this.nombre,
       correo: correo ?? this.correo,
       rol: rol ?? this.rol,
+      photoUrl: photoUrl ?? this.photoUrl,
       passwordHash: passwordHash ?? this.passwordHash,
       createdAt: createdAt ?? this.createdAt,
     );
