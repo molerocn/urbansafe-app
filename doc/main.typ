@@ -43,4 +43,11 @@
 #pagebreak()
 
 = Anexos
+
+== Manual de usuario
+Revisar el documento "manual_usuario.pdf".
+
+== Diccionario de datos
+Revisar el documento "diccionario_datos.pdf".
+
 #include "anexos/matriz_consistencia.typ"

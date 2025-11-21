@@ -1,7 +1,7 @@
 #let autores = (
-  "Molero Rojas, Juan Carlos",
-  "Torres Fernández, Adrian Enrique",
-  "Tito Auccatoma, Daniel Alvaro",
-  "Barreto Velasquez, Johan Alejandro",
-  "Ramos Verano, Wilmer Alexander",
+  "Molero Rojas, Juan Carlos - 100%",
+  "Torres Fernández, Adrian Enrique - 100%",
+  "Tito Auccatoma, Daniel Alvaro - 80%",
+  "Barreto Velasquez, Johan Alejandro - 100%",
+  "Ramos Verano, Wilmer Alexander - 100%",
 )
