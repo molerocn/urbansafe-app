@@ -195,6 +195,13 @@ class _HomePageState extends State<HomePage> {
         title: Text(AppTranslations.get('app_title', lang)),
         actions: [
           IconButton(
+            tooltip: AppTranslations.get('change_language', lang),
+            icon: const Icon(Icons.language),
+            onPressed: () async {
+              await localization.toggleLanguage();
+            },
+          ),
+          IconButton(
             tooltip: AppTranslations.get('history', lang),
             icon: const Icon(Icons.history),
             onPressed: () {
@@ -234,7 +241,6 @@ class _HomePageState extends State<HomePage> {
                                 textAlign: TextAlign.center,
                                 style: textTheme.displayMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
-                                  color: colorScheme.primary,
                                 ),
                               ),
                               const SizedBox(height: 12),
