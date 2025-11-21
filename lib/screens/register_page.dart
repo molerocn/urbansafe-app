@@ -1,8 +1,11 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 import '../models/user.dart';
 import '../src/auth/hash.dart';
+import '../src/app_translations.dart';
+import '../services/localization_service.dart';
 
 /// Página de registro de nuevos usuarios.
 class RegisterPage extends StatefulWidget {
@@ -22,7 +25,7 @@ class _RegisterPageState extends State<RegisterPage> {
   String? _error;
   bool _loading = false;
 
-  Future<void> _registerFirestore() async {
+  Future<void> _registerFirestore(String lang) async {
     if (!(_formKey.currentState?.validate() ?? false)) return;
 
     final nombre = _nameController.text.trim();
@@ -43,7 +46,7 @@ class _RegisterPageState extends State<RegisterPage> {
           .get();
 
       if (q.docs.isNotEmpty) {
-        setState(() => _error = 'Ya existe una cuenta con ese correo.');
+        setState(() => _error = AppTranslations.get('account_exists', lang));
         return;
       }
 
@@ -63,18 +66,20 @@ class _RegisterPageState extends State<RegisterPage> {
 
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Registro exitoso. Ahora puedes iniciar sesión.'),
+        SnackBar(
+          content: Text(AppTranslations.get('registration_success', lang)),
         ),
       );
       Navigator.of(context).pop();
     } on FirebaseException catch (fe) {
       setState(
-        () =>
-            _error = 'Error al guardar en Firestore: ${fe.message ?? fe.code}',
+        () => _error =
+            '${AppTranslations.get('registration_error', lang)}: ${fe.message ?? fe.code}',
       );
     } catch (e) {
-      setState(() => _error = 'Error al registrar: $e');
+      setState(
+        () => _error = '${AppTranslations.get('registration_error', lang)}: $e',
+      );
     } finally {
       if (mounted) setState(() => _loading = false);
     }
@@ -91,17 +96,28 @@ class _RegisterPageState extends State<RegisterPage> {
 
   @override
   Widget build(BuildContext context) {
+    final localization = context.watch<LocalizationService>();
+    final lang = localization.currentLanguageCode;
+
     return Scaffold(
       backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // 
+            //
             Stack(
               children: [
                 // Imagen de fondo
                 Image.asset(
-                  'lib/assets/images/callafondo.jpeg', // asegúrate de tenerlo en assets/images
+                  'lib/assets/images/callafondo.jpeg',
                   width: double.infinity,
                   height: 220,
                   fit: BoxFit.cover,
@@ -116,7 +132,7 @@ class _RegisterPageState extends State<RegisterPage> {
                       begin: Alignment.topCenter,
                       end: Alignment.bottomCenter,
                       colors: [
-                        Colors.black.withOpacity(0.45),
+                        Colors.black.withValues(alpha: 0.45),
                         Colors.transparent,
                       ],
                     ),
@@ -129,20 +145,22 @@ class _RegisterPageState extends State<RegisterPage> {
                     alignment: Alignment.center,
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children: [
                         Text(
-                          "URBANSAFE",
-                          style: TextStyle(
+                          AppTranslations.get('app_title', lang),
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 30,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 1.5,
                           ),
                         ),
-                        SizedBox(height: 5),
+                        const SizedBox(height: 5),
                         Text(
-                          "prioriza tu seguridad",
-                          style: TextStyle(
+                          lang == 'es'
+                              ? "prioriza tu seguridad"
+                              : "prioritize your safety",
+                          style: const TextStyle(
                             color: Colors.white,
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
@@ -157,7 +175,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
             const SizedBox(height: 30),
 
-            // 
+            //
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24.0),
               child: Form(
@@ -165,21 +183,27 @@ class _RegisterPageState extends State<RegisterPage> {
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 child: Column(
                   children: [
-                    _buildField(controller: _nameController, label: 'Nombre'),
+                    _buildField(
+                      controller: _nameController,
+                      label: AppTranslations.get('full_name', lang),
+                      validator: (v) => (v == null || v.trim().isEmpty)
+                          ? AppTranslations.get('name_required', lang)
+                          : null,
+                    ),
                     const SizedBox(height: 16),
                     _buildField(
                       controller: _emailController,
-                      label: 'Correo electrónico',
+                      label: AppTranslations.get('email', lang),
                       keyboardType: TextInputType.emailAddress,
                       validator: (v) {
                         if (v == null || v.trim().isEmpty) {
-                          return 'Ingresa un correo';
+                          return AppTranslations.get('email_required', lang);
                         }
                         final emailReg = RegExp(
                           r"^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$",
                         );
                         if (!emailReg.hasMatch(v.trim())) {
-                          return 'Correo inválido';
+                          return AppTranslations.get('email_invalid', lang);
                         }
                         return null;
                       },
@@ -187,14 +211,14 @@ class _RegisterPageState extends State<RegisterPage> {
                     const SizedBox(height: 16),
                     _buildField(
                       controller: _passwordController,
-                      label: 'Contraseña',
+                      label: AppTranslations.get('password', lang),
                       obscureText: true,
                       validator: (v) {
                         if (v == null || v.isEmpty) {
-                          return 'Ingresa una contraseña';
+                          return AppTranslations.get('password_required', lang);
                         }
                         if (v.length < 6) {
-                          return 'Debe tener al menos 6 caracteres';
+                          return AppTranslations.get('password_short', lang);
                         }
                         return null;
                       },
@@ -202,14 +226,20 @@ class _RegisterPageState extends State<RegisterPage> {
                     const SizedBox(height: 16),
                     _buildField(
                       controller: _confirmPasswordController,
-                      label: 'Confirmar contraseña',
+                      label: lang == 'es'
+                          ? 'Confirmar contraseña'
+                          : 'Confirm Password',
                       obscureText: true,
                       validator: (v) {
                         if (v == null || v.isEmpty) {
-                          return 'Confirma la contraseña';
+                          return lang == 'es'
+                              ? 'Confirma la contraseña'
+                              : 'Confirm your password';
                         }
                         if (v != _passwordController.text) {
-                          return 'Las contraseñas no coinciden';
+                          return lang == 'es'
+                              ? 'Las contraseñas no coinciden'
+                              : 'Passwords do not match';
                         }
                         return null;
                       },
@@ -227,7 +257,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         : SizedBox(
                             width: double.infinity,
                             child: ElevatedButton(
-                              onPressed: _registerFirestore,
+                              onPressed: () => _registerFirestore(lang),
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.blueAccent,
                                 foregroundColor: Colors.white,
@@ -238,15 +268,32 @@ class _RegisterPageState extends State<RegisterPage> {
                                   vertical: 14,
                                 ),
                               ),
-                              child: const Text(
-                                'Registrarme',
-                                style: TextStyle(
+                              child: Text(
+                                AppTranslations.get('register_button', lang),
+                                style: const TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
                                 ),
                               ),
                             ),
                           ),
+
+                    const SizedBox(height: 30),
+
+                    // Botón de cambiar idioma
+                    Tooltip(
+                      message: AppTranslations.get('change_language', lang),
+                      child: TextButton.icon(
+                        onPressed: () async {
+                          await localization.toggleLanguage();
+                        },
+                        icon: const Icon(Icons.language, size: 20),
+                        label: Text(
+                          localization.getOtherLanguageName(),
+                          style: const TextStyle(fontSize: 12),
+                        ),
+                      ),
+                    ),
 
                     const SizedBox(height: 40),
                   ],
@@ -259,7 +306,7 @@ class _RegisterPageState extends State<RegisterPage> {
     );
   }
 
-  /// 
+  ///
   Widget _buildField({
     required TextEditingController controller,
     required String label,

@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'dart:convert';
 import 'dart:async';
 
@@ -19,6 +20,8 @@ import '../models/risk_measurement.dart';
 import '../repositories/measurement_repository.dart';
 import '../src/app_logger.dart';
 import '../src/app_constants.dart';
+import '../src/app_translations.dart';
+import '../services/localization_service.dart';
 import 'measurements_history_page.dart';
 import 'login_page.dart';
 
@@ -66,21 +69,21 @@ class _HomePageState extends State<HomePage> {
   }
 
   // Devuelve una descripción del nivel de riesgo basado en la etiqueta.
-  String _mapLabelToDescription(String label) {
+  String _mapLabelToDescription(String label, String languageCode) {
     final s = label.toLowerCase();
     if (s.contains('muy') && s.contains('alta')) {
-      return 'Existe una alta probabilidad de un suceso delictivo';
+      return AppTranslations.get('risk_description_very_high', languageCode);
     }
     if (s.contains('alta')) {
-      return 'Riesgo alto en la zona';
+      return AppTranslations.get('risk_description_high', languageCode);
     }
     if (s.contains('media')) {
-      return 'Riesgo medio en la zona';
+      return AppTranslations.get('risk_description_medium', languageCode);
     }
     if (s.contains('baja')) {
-      return 'Riesgo bajo en la zona';
+      return AppTranslations.get('risk_description_low', languageCode);
     }
-    return 'Riesgo desconocido';
+    return AppTranslations.get('risk_description_unknown', languageCode);
   }
 
   Future<void> _fetchPredictAndSave() async {
@@ -247,13 +250,24 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final name = widget.user.nombre.isNotEmpty ? widget.user.nombre : 'Usuario';
+    final localization = context.watch<LocalizationService>();
+    final lang = localization.currentLanguageCode;
+    final name = widget.user.nombre.isNotEmpty
+        ? widget.user.nombre
+        : AppTranslations.get('welcome', lang);
     return Scaffold(
       appBar: AppBar(
-        title: const Text('UrbanSafe'),
+        title: Text(AppTranslations.get('app_title', lang)),
         actions: [
           IconButton(
-            tooltip: 'Historial',
+            tooltip: AppTranslations.get('change_language', lang),
+            icon: const Icon(Icons.language),
+            onPressed: () async {
+              await localization.toggleLanguage();
+            },
+          ),
+          IconButton(
+            tooltip: AppTranslations.get('history', lang),
             icon: const Icon(Icons.history),
             onPressed: () {
               Navigator.of(context).push(
@@ -264,7 +278,7 @@ class _HomePageState extends State<HomePage> {
             },
           ),
           IconButton(
-            tooltip: 'Cerrar sesión',
+            tooltip: AppTranslations.get('logout', lang),
             icon: const Icon(Icons.logout),
             onPressed: () async {
               final navigator = Navigator.of(context);
@@ -317,7 +331,7 @@ class _HomePageState extends State<HomePage> {
               child: Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
-                  'Bienvenido, $name',
+                  '${AppTranslations.get('welcome_message', lang)}$name',
                   style: const TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.w600,
@@ -332,51 +346,59 @@ class _HomePageState extends State<HomePage> {
                     : RepaintBoundary(
                         key: _screenshotKey,
                         child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            _riskLabel.isNotEmpty ? _riskLabel : 'Muy alta',
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 56,
-                              fontWeight: FontWeight.bold,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              _riskLabel.isNotEmpty
+                                  ? _riskLabel
+                                  : AppTranslations.get('risk_very_high', lang),
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(
+                                fontSize: 56,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 12),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 40.0,
-                            ),
-                            child: Column(
-                              children: [
-                                Text(
-                                  _riskLabel.isNotEmpty
-                                      ? _mapLabelToDescription(_riskLabel)
-                                      : 'Existe una alta probabilidad de un suceso delictivo',
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.black54,
-                                  ),
-                                ),
-                                if (_riskValue > 0)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 8.0),
-                                    child: Text(
-                                      'Score: ${_riskValue.toStringAsFixed(2)}',
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: Colors.black45,
-                                      ),
+                            const SizedBox(height: 12),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 40.0,
+                              ),
+                              child: Column(
+                                children: [
+                                  Text(
+                                    _riskLabel.isNotEmpty
+                                        ? _mapLabelToDescription(
+                                            _riskLabel,
+                                            lang,
+                                          )
+                                        : AppTranslations.get(
+                                            'risk_description_very_high',
+                                            lang,
+                                          ),
+                                    textAlign: TextAlign.center,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.black54,
                                     ),
                                   ),
-                              ],
+                                  if (_riskValue > 0)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Text(
+                                        '${AppTranslations.get('score', lang)}: ${_riskValue.toStringAsFixed(2)}',
+                                        style: const TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.black45,
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
               ),
-            ),
             ),
             Padding(
               padding: const EdgeInsets.only(bottom: 28.0),
@@ -387,22 +409,22 @@ class _HomePageState extends State<HomePage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        onPressed: () => _showEmergencyNumbers(context),
+                        onPressed: () => _showEmergencyNumbers(context, lang),
                         icon: const Icon(Icons.call, size: 28),
                       ),
                       const SizedBox(height: 6),
-                      const Text('Numeros de emergencia'),
+                      Text(AppTranslations.get('emergency_numbers', lang)),
                     ],
                   ),
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       IconButton(
-                        onPressed: () => _showShareModal(context),
+                        onPressed: () => _showShareModal(context, lang),
                         icon: const Icon(Icons.share, size: 28),
                       ),
                       const SizedBox(height: 6),
-                      const Text('Compartir captura'),
+                      Text(AppTranslations.get('share_screenshot', lang)),
                     ],
                   ),
                 ],
@@ -416,16 +438,23 @@ class _HomePageState extends State<HomePage> {
 
   Future<File?> _captureAndSavePng() async {
     try {
-      final boundary = _screenshotKey.currentContext?.findRenderObject()
-          as RenderRepaintBoundary?;
+      final boundary =
+          _screenshotKey.currentContext?.findRenderObject()
+              as RenderRepaintBoundary?;
       if (boundary == null) return null;
       final view = WidgetsBinding.instance.platformDispatcher.views.first;
-      final ui.Image image = await boundary.toImage(pixelRatio: view.devicePixelRatio);
-      final ByteData? byteData = await image.toByteData(format: ui.ImageByteFormat.png);
+      final ui.Image image = await boundary.toImage(
+        pixelRatio: view.devicePixelRatio,
+      );
+      final ByteData? byteData = await image.toByteData(
+        format: ui.ImageByteFormat.png,
+      );
       if (byteData == null) return null;
       final Uint8List pngBytes = byteData.buffer.asUint8List();
       final dir = await getTemporaryDirectory();
-      final file = File('${dir.path}/screenshot_${DateTime.now().millisecondsSinceEpoch}.png');
+      final file = File(
+        '${dir.path}/screenshot_${DateTime.now().millisecondsSinceEpoch}.png',
+      );
       await file.writeAsBytes(pngBytes);
       return file;
     } catch (e) {
@@ -435,26 +464,37 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _showShareModal(BuildContext context) async {
+  void _showShareModal(BuildContext context, String lang) async {
     final file = await _captureAndSavePng();
     if (file == null) {
-      if (mounted) ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('No se pudo generar la captura.')),
-      );
+      if (mounted) {
+        // ignore: use_build_context_synchronously
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(AppTranslations.get('screenshot_failed', lang)),
+          ),
+        );
+      }
       return;
     }
 
+    if (!mounted) return;
+    // ignore: use_build_context_synchronously
     showModalBottomSheet<void>(
+      // ignore: use_build_context_synchronously
       context: context,
       builder: (ctx) => SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 12.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12.0),
               child: Text(
-                'Compartir captura',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                AppTranslations.get('share_screenshot', lang),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             Padding(
@@ -466,15 +506,26 @@ class _HomePageState extends State<HomePage> {
               children: [
                 ElevatedButton.icon(
                   onPressed: () async {
-                    await Share.shareXFiles([XFile(file.path)], text: 'Nivel: ${_riskLabel}\nScore: ${_riskValue.toStringAsFixed(2)}');
-                    Navigator.of(context).pop();
+                    // ignore: deprecated_member_use
+                    await Share.shareXFiles(
+                      [XFile(file.path)],
+                      text:
+                          '${AppTranslations.get('risk_level', lang)}: $_riskLabel\n${AppTranslations.get('score', lang)}: ${_riskValue.toStringAsFixed(2)}',
+                    );
+                    if (mounted) {
+                      // ignore: use_build_context_synchronously
+                      Navigator.of(context).pop();
+                    }
                   },
                   icon: const Icon(Icons.share),
-                  label: const Text('Compartir'),
+                  label: Text(AppTranslations.get('share_button', lang)),
                 ),
                 TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Cerrar'),
+                  onPressed: () {
+                    // ignore: use_build_context_synchronously
+                    Navigator.of(context).pop();
+                  },
+                  child: Text(AppTranslations.get('close', lang)),
                 ),
               ],
             ),
@@ -485,11 +536,17 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  void _showEmergencyNumbers(BuildContext context) {
+  void _showEmergencyNumbers(BuildContext context, String lang) {
     final numbers = <Map<String, String>>[
-      {'label': 'Serenazgo', 'number': '+51123456789'},
-      {'label': 'Ambulancia', 'number': '+51123456790'},
-      {'label': 'Policía', 'number': '+51123456791'},
+      {
+        'label': AppTranslations.get('serenazgo', lang),
+        'number': '+51123456789',
+      },
+      {
+        'label': AppTranslations.get('ambulance', lang),
+        'number': '+51123456790',
+      },
+      {'label': AppTranslations.get('police', lang), 'number': '+51123456791'},
     ];
 
     showModalBottomSheet<void>(
@@ -498,26 +555,31 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Padding(
-              padding: EdgeInsets.symmetric(vertical: 12.0),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 12.0),
               child: Text(
-                'Números de emergencia',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                AppTranslations.get('emergency_numbers', lang),
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
-            ...numbers.map((item) => ListTile(
-                  leading: const Icon(Icons.phone),
-                  title: Text(item['label'] ?? ''),
-                  subtitle: Text(item['number'] ?? ''),
-                  onTap: () {
-                    final num = item['number'] ?? '';
-                    _launchPhone(num);
-                  },
-                )),
+            ...numbers.map(
+              (item) => ListTile(
+                leading: const Icon(Icons.phone),
+                title: Text(item['label'] ?? ''),
+                subtitle: Text(item['number'] ?? ''),
+                onTap: () {
+                  final num = item['number'] ?? '';
+                  _launchPhone(num);
+                },
+              ),
+            ),
             const SizedBox(height: 8),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Cerrar'),
+              child: Text(AppTranslations.get('close', lang)),
             ),
           ],
         ),
