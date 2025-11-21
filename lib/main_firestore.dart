@@ -12,17 +12,17 @@ import 'src/app_constants.dart';
 import 'models/user.dart';
 import 'src/app_colors.dart';
 import 'services/localization_service.dart';
+import 'src/theme_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
+  await ThemeService.loadTheme(); // Carga la preferencia de tema guardada
 
-  // Conectar opcionalmente al emulador de Firestore en modo debug cuando se solicite explícitamente
   const useEmulator = bool.fromEnvironment('USE_EMULATOR', defaultValue: false);
   if (useEmulator) {
-    try {
-      // Conexión al emulador dejada comentada para evitar problemas en tiempo de ejecución
-    } catch (_) {}
+    try {}
+    catch (_) {}
   }
 
   runApp(
@@ -40,27 +40,42 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     final localizationService = context.watch<LocalizationService>();
 
-    return MaterialApp(
-      title: 'UrbanSafe',
-      locale: localizationService.currentLocale,
-      supportedLocales: const [Locale('es'), Locale('en')],
-      localizationsDelegates: GlobalMaterialLocalizations.delegates,
-      theme: ThemeData(
-        colorScheme: const ColorScheme(
-          brightness: Brightness.light,
-          primary: AppColors.primary,
-          onPrimary: Colors.white,
-          secondary: AppColors.secondary,
-          onSecondary: Colors.white,
-          error: AppColors.error,
-          onError: Colors.white,
-          surface: AppColors.background,
-          onSurface: Colors.black,
-        ),
-        scaffoldBackgroundColor: AppColors.background,
-        useMaterial3: true,
-      ),
-      home: const _SessionRestorer(),
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: ThemeService.themeModeNotifier,
+      builder: (context, currentMode, child) {
+        return MaterialApp(
+          title: 'UrbanSafe',
+          locale: localizationService.currentLocale,
+          supportedLocales: const [Locale('es'), Locale('en')],
+          localizationsDelegates: GlobalMaterialLocalizations.delegates,
+          themeMode: currentMode,
+          theme: ThemeData(
+            colorScheme: const ColorScheme(
+              brightness: Brightness.light,
+              primary: AppColors.primary,
+              onPrimary: Colors.white,
+              secondary: AppColors.secondary,
+              onSecondary: Colors.white,
+              error: AppColors.error,
+              onError: Colors.white,
+              surface: AppColors.background,
+              onSurface: Colors.black,
+            ),
+            scaffoldBackgroundColor: AppColors.background,
+            useMaterial3: true,
+          ),
+          darkTheme: ThemeData(
+            brightness: Brightness.dark,
+            colorScheme: const ColorScheme.dark(
+              primary: AppColors.primary,
+              secondary: AppColors.secondary,
+              surface: Color(0xFF121212), // Color de fondo estándar para modo oscuro
+            ),
+            useMaterial3: true,
+          ),
+          home: const _SessionRestorer(),
+        );
+      },
     );
   }
 }
@@ -84,16 +99,11 @@ class _SessionRestorerState extends State<_SessionRestorer> {
         return const LoginPage();
       }
 
-      final doc = await FirebaseFirestore.instance
-          .collection('users')
-          .doc(userId)
-          .get();
+      final doc = await FirebaseFirestore.instance.collection('users').doc(userId).get();
       if (!doc.exists) return const LoginPage();
       final data = doc.data();
-      final serverToken = data == null
-          ? null
-          : (data['sessionToken'] as String?);
-      final expiryTs = data == null ? null : data['sessionTokenExpiry'];
+      final serverToken = data?['sessionToken'] as String?;
+      final expiryTs = data?['sessionTokenExpiry'];
       DateTime? expiry;
       if (expiryTs is Timestamp) {
         expiry = expiryTs.toDate().toUtc();
@@ -105,16 +115,11 @@ class _SessionRestorerState extends State<_SessionRestorer> {
       }
 
       final now = DateTime.now().toUtc();
-      if (serverToken != null &&
-          serverToken == token &&
-          expiry != null &&
-          now.isBefore(expiry)) {
+      if (serverToken != null && serverToken == token && expiry != null && now.isBefore(expiry)) {
         final user = User.fromDoc(doc);
         return HomePage(user: user);
       }
-    } catch (_) {
-      // Ignorar y continuar a LoginPage
-    }
+    } catch (_) {}
     return const LoginPage();
   }
 
@@ -124,9 +129,7 @@ class _SessionRestorerState extends State<_SessionRestorer> {
       future: _determineStart(),
       builder: (context, snap) {
         if (snap.connectionState != ConnectionState.done) {
-          return const Scaffold(
-            body: Center(child: CircularProgressIndicator()),
-          );
+          return const Scaffold(body: Center(child: CircularProgressIndicator()));
         }
         return snap.data ?? const LoginPage();
       },

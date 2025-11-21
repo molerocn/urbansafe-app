@@ -83,6 +83,15 @@ class AppTranslations {
       'longitude': 'Longitud',
       'date_format': 'dd/MM/yyyy HH:mm',
 
+      // Profile Drawer
+      'edit_profile': 'Editar Perfil',
+      'name': 'Nombre',
+      'email_non_editable': 'Correo (no editable)',
+      'edit': 'Editar',
+      'save': 'Guardar',
+      'dark_mode': 'Modo oscuro',
+      'profile_update_error': 'Error al actualizar el perfil',
+      
       // Permissions
       'location_permission': 'Permiso de ubicación',
       'location_permission_message':
@@ -183,6 +192,15 @@ class AppTranslations {
       'longitude': 'Longitude',
       'date_format': 'MM/dd/yyyy HH:mm',
 
+      // Profile Drawer
+      'edit_profile': 'Edit Profile',
+      'name': 'Name',
+      'email_non_editable': 'Email (not editable)',
+      'edit': 'Edit',
+      'save': 'Save',
+      'dark_mode': 'Dark Mode',
+      'profile_update_error': 'Error updating profile',
+      
       // Permissions
       'location_permission': 'Location Permission',
       'location_permission_message':
