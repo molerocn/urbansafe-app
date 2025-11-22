@@ -7,6 +7,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:provider/provider.dart';
 
 import '../models/user.dart';
+import '../src/app_colors.dart';
 import '../src/auth/hash.dart';
 import '../src/app_constants.dart';
 import '../src/app_translations.dart';
@@ -148,7 +149,7 @@ class _LoginPageState extends State<LoginPage> {
                         Text(
                           AppTranslations.get('app_title', lang),
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.background, // Dorado
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
                           ),
@@ -159,7 +160,7 @@ class _LoginPageState extends State<LoginPage> {
                               ? "prioriza tu seguridad"
                               : "prioritize your safety",
                           style: const TextStyle(
-                            color: Colors.white,
+                            color: AppColors.background, // Dorado
                             fontSize: 14,
                           ),
                         ),
@@ -265,13 +266,13 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
 
-                  const SizedBox(height: 40),
+                  const SizedBox(height: 20),
 
                   // Texto de registro
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(AppTranslations.get('already_have_account', lang)),
+                      Text(lang == 'es' ? 'No tienes una cuenta?' : 'Don\'t have an account?'),
                       GestureDetector(
                         onTap: () {
                           Navigator.of(context).push(
@@ -281,7 +282,7 @@ class _LoginPageState extends State<LoginPage> {
                           );
                         },
                         child: Text(
-                          AppTranslations.get('create_account', lang),
+                          lang == 'es' ? ' Regístrate aquí' : ' Register here',
                           style: TextStyle(
                             color: colorScheme.primary,
                             fontWeight: FontWeight.bold,
@@ -290,6 +291,7 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                     ],
                   ),
+
                   const SizedBox(height: 20),
 
                   // Botón de cambiar idioma

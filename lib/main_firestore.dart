@@ -59,18 +59,24 @@ class MyApp extends StatelessWidget {
               error: AppColors.error,
               onError: Colors.white,
               surface: AppColors.background,
-              onSurface: Colors.black,
+              onSurface: AppColors.tertiary,
             ),
             scaffoldBackgroundColor: AppColors.background,
             useMaterial3: true,
           ),
           darkTheme: ThemeData(
-            brightness: Brightness.dark,
-            colorScheme: const ColorScheme.dark(
+            colorScheme: const ColorScheme(
+              brightness: Brightness.dark,
               primary: AppColors.primary,
+              onPrimary: Colors.white,
               secondary: AppColors.secondary,
-              surface: Color(0xFF121212), // Color de fondo estándar para modo oscuro
+              onSecondary: Colors.white,
+              error: AppColors.error,
+              onError: Colors.white,
+              surface: AppColors.tertiary,
+              onSurface: Colors.white,
             ),
+            scaffoldBackgroundColor: AppColors.tertiary,
             useMaterial3: true,
           ),
           home: const _SessionRestorer(),
