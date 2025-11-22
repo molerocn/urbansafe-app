@@ -138,6 +138,7 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
   @override
   Widget build(BuildContext context) {
     final textTheme = Theme.of(context).textTheme;
+    final colorScheme = Theme.of(context).colorScheme;
     final localization = context.watch<LocalizationService>();
     final lang = localization.currentLanguageCode;
 
@@ -146,7 +147,7 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
         padding: EdgeInsets.zero,
         children: <Widget>[
           _buildHeader(context, textTheme),
-          _buildProfileForm(textTheme, lang),
+          _buildProfileForm(textTheme, lang, colorScheme),
           const Divider(),
           ValueListenableBuilder<ThemeMode>(
             valueListenable: ThemeService.themeModeNotifier,
@@ -159,17 +160,18 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
                 },
                 secondary: Icon(
                   currentMode == ThemeMode.dark ? Icons.dark_mode : Icons.light_mode,
+                  color: colorScheme.onSurface,
                 ),
               );
             },
           ),
           ListTile(
-            leading: const Icon(Icons.language),
+            leading: Icon(Icons.language, color: colorScheme.onSurface),
             title: Text(AppTranslations.get('change_language', lang)),
             onTap: () async => await localization.toggleLanguage(),
           ),
           ListTile(
-            leading: const Icon(Icons.logout),
+            leading: Icon(Icons.logout, color: colorScheme.onSurface),
             title: Text(AppTranslations.get('logout', lang)),
             onTap: _logout,
           ),
@@ -221,7 +223,7 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
     );
   }
 
-  Widget _buildProfileForm(TextTheme textTheme, String lang) {
+  Widget _buildProfileForm(TextTheme textTheme, String lang, ColorScheme colorScheme) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: Column(
@@ -244,27 +246,28 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
           Center(
             child: _isSaving
               ? const CircularProgressIndicator()
-              : (_isEditing ? _buildSaveCancelButtons(lang) : _buildEditButton(lang)),
+              : (_isEditing ? _buildSaveCancelButtons(lang) : _buildEditButton(lang, colorScheme)),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildEditButton(String lang) {
+  Widget _buildEditButton(String lang, ColorScheme colorScheme) {
     return ElevatedButton.icon(
-      icon: const Icon(Icons.edit),
-      label: Text(AppTranslations.get('edit', lang)),
+      icon: Icon(Icons.edit, color: colorScheme.onSurface),
+      label: Text(AppTranslations.get('edit', lang), style: TextStyle(color: colorScheme.onSurface)),
       onPressed: () => setState(() => _isEditing = true),
     );
   }
 
   Widget _buildSaveCancelButtons(String lang) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: <Widget>[
         TextButton(
-          child: Text(AppTranslations.get('cancel', lang)),
+          child: Text(AppTranslations.get('cancel', lang), style: TextStyle(color: colorScheme.onSurface)),
           onPressed: () {
             setState(() {
               _isEditing = false;
@@ -275,7 +278,7 @@ class _ProfileDrawerState extends State<ProfileDrawer> {
         ),
         ElevatedButton(
           onPressed: () => _saveProfile(lang),
-          child: Text(AppTranslations.get('save', lang)),
+          child: Text(AppTranslations.get('save', lang), style: TextStyle(color: colorScheme.onSurface)),
         ),
       ],
     );

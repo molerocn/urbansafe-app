@@ -8,6 +8,7 @@ import '../repositories/measurement_repository.dart';
 import '../services/export_service.dart';
 import '../services/localization_service.dart';
 import '../src/app_translations.dart';
+import '../src/app_colors.dart';
 import 'history_map_page.dart'; // Importa la nueva página del mapa
 
 /// Página que muestra el historial de mediciones de riesgo de un usuario.
@@ -38,30 +39,31 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
   // Devuelve un ícono representativo del nivel de riesgo de la medición.
   Icon _iconForMedicion(RiskMeasurement m) {
     final label = (m.nivelRiesgoLabel ?? '').toLowerCase();
+    final colorScheme = Theme.of(context).colorScheme;
     if (label.contains('muy') && label.contains('alta')) {
-      return const Icon(Icons.priority_high, color: Colors.red);
+      return Icon(Icons.priority_high, color: colorScheme.error);
     }
     if (label.contains('alta')) {
-      return const Icon(Icons.warning, color: Colors.redAccent);
+      return Icon(Icons.warning, color: colorScheme.error);
     }
     if (label.contains('media')) {
-      return const Icon(Icons.report_problem, color: Colors.orange);
+      return Icon(Icons.report_problem, color: AppColors.secondary);
     }
     if (label.contains('baja')) {
-      return const Icon(Icons.check_circle, color: Colors.green);
+      return Icon(Icons.check_circle, color: colorScheme.primary);
     }
     // fallback based on numeric
     final v = m.nivelRiesgo;
     if (v >= 3.5) {
-      return const Icon(Icons.priority_high, color: Colors.red);
+      return Icon(Icons.priority_high, color: colorScheme.error);
     }
     if (v >= 2.5) {
-      return const Icon(Icons.warning, color: Colors.redAccent);
+      return Icon(Icons.warning, color: colorScheme.error);
     }
     if (v >= 1.5) {
-      return const Icon(Icons.report_problem, color: Colors.orange);
+      return Icon(Icons.report_problem, color: AppColors.secondary);
     }
-    return const Icon(Icons.check_circle, color: Colors.green);
+    return Icon(Icons.check_circle, color: colorScheme.primary);
   }
 
   // Formatea la fecha de la medición para mostrarla en la lista.
@@ -105,7 +107,7 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
   Future<void> _exportToCSV(String lang) async {
     try {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppTranslations.get('loading', lang))),
+        SnackBar(content: Text(AppTranslations.get('loading', lang)), backgroundColor: Theme.of(context).colorScheme.surfaceVariant),
       );
 
       final filePath = await ExportService.exportToCSV(_items);
@@ -113,6 +115,7 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(AppTranslations.get('export_success', lang)),
+            backgroundColor: Theme.of(context).colorScheme.primary,
             action: SnackBarAction(
               label: AppTranslations.get('share_button', lang),
               onPressed: () => ExportService.shareFile(filePath),
@@ -125,6 +128,7 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${AppTranslations.get('export_error', lang)}: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
       }
@@ -135,7 +139,7 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
   Future<void> _exportToPDF(String lang) async {
     try {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(AppTranslations.get('loading', lang))),
+        SnackBar(content: Text(AppTranslations.get('loading', lang)), backgroundColor: Theme.of(context).colorScheme.surfaceVariant),
       );
 
       final filePath = await ExportService.exportToPDF(_items);
@@ -143,6 +147,7 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(AppTranslations.get('export_success', lang)),
+            backgroundColor: Theme.of(context).colorScheme.primary,
             action: SnackBarAction(
               label: AppTranslations.get('share_button', lang),
               onPressed: () => ExportService.shareFile(filePath),
@@ -155,6 +160,7 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text('${AppTranslations.get('export_error', lang)}: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
           ),
         );
       }
@@ -166,6 +172,7 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
   Widget build(BuildContext context) {
     final localization = context.watch<LocalizationService>();
     final lang = localization.currentLanguageCode;
+    final colorScheme = Theme.of(context).colorScheme;
     final uid = widget.user.id;
     if (uid == null) {
       return Scaffold(
@@ -176,11 +183,12 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppTranslations.get('history_title', lang)),
+        title: Text(AppTranslations.get('history_title', lang), style: TextStyle(color: AppColors.secondary)),
+        backgroundColor: Theme.of(context).colorScheme.primary,
         actions: [
           if (_items.isNotEmpty) // Solo muestra el botón si hay mediciones
             IconButton(
-              icon: const Icon(Icons.map_outlined),
+              icon: Icon(Icons.map_outlined, color: colorScheme.onPrimary),
               tooltip: 'Ver en mapa', // TODO: Internacionalizar
               onPressed: () {
                 Navigator.of(context).push(
@@ -205,13 +213,13 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
                       children: [
                         ElevatedButton.icon(
                           onPressed: () => _exportToCSV(lang),
-                          icon: const Icon(Icons.file_download),
-                          label: Text(AppTranslations.get('export_csv', lang)),
+                          icon: Icon(Icons.file_download, color: colorScheme.onSurface),
+                          label: Text(AppTranslations.get('export_csv', lang), style: TextStyle(color: colorScheme.onSurface)),
                         ),
                         ElevatedButton.icon(
                           onPressed: () => _exportToPDF(lang),
-                          icon: const Icon(Icons.picture_as_pdf),
-                          label: const Text('PDF'),
+                          icon: Icon(Icons.picture_as_pdf, color: colorScheme.onSurface),
+                          label: Text('PDF', style: TextStyle(color: colorScheme.onSurface)),
                         ),
                       ],
                     ),
@@ -284,16 +292,8 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
                         ? const CircularProgressIndicator()
                         : ElevatedButton(
                             onPressed: _loadPage,
-                            child: Text(AppTranslations.get('load_more', lang)),
+                            child: Text(AppTranslations.get('load_more', lang), style: TextStyle(color: colorScheme.onSurface)),
                           ),
-                  ),
-                if (!_hasMore)
-                  Padding(
-                    padding: const EdgeInsets.all(12.0),
-                    child: Text(
-                      AppTranslations.get('no_measurements', lang),
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
                   ),
               ],
             ),

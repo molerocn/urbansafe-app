@@ -7,9 +7,7 @@ class AppColors {
 
   static const Color primary = Color(0xFF27548A);  // Azul profundo
   static const Color secondary = Color(0xFFDDA853);  // Dorado
-  static const Color success = Color(0xFF4CAF50);
-  static const Color warning = Color(0xFFFFC107);
-  static const Color error = Color(0xFFF44336);
-  static const Color info = Color(0xFF2196F3);
-  static const Color background = Color(0xFFFFFFFF);
+  static const Color tertiary = Color(0xFF183B4E);  // Azul más oscuro
+  static const Color background = Color(0xFFF5EEDC);  // Beige claro
+  static const Color error = Color(0xFFD32F2F);  // Rojo para errores
 }

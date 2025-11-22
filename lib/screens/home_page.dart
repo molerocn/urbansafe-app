@@ -7,7 +7,6 @@ import 'package:path_provider/path_provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:flutter/rendering.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
@@ -21,10 +20,10 @@ import '../repositories/measurement_repository.dart';
 import '../src/app_logger.dart';
 import '../src/app_constants.dart';
 import '../src/app_translations.dart';
+import '../src/app_colors.dart';
 import '../services/localization_service.dart';
 import 'measurements_history_page.dart';
 import 'profile_drawer.dart';
-import 'login_page.dart';
 
 // Página principal que muestra el nivel de riesgo actual y opciones de usuario.
 class HomePage extends StatefulWidget {
@@ -42,8 +41,6 @@ class _HomePageState extends State<HomePage> {
   late User _currentUser;
   bool _saved = false;
   bool _loading = false;
-  Timer? _loadingTimer;
-  bool _loadingShown = false;
   String _riskLabel = '';
   double _riskValue = 0.0;
 
@@ -58,6 +55,15 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _currentUser = newUser;
     });
+  }
+
+  void _refreshMeasurement() {
+    setState(() {
+      _saved = false;
+      _riskLabel = '';
+      _riskValue = 0.0;
+    });
+    _fetchPredictAndSave();
   }
 
   double _mapLabelToValue(String label) {
@@ -98,11 +104,7 @@ class _HomePageState extends State<HomePage> {
     if (_saved) return;
     _saved = true;
 
-    _loadingShown = false;
-    _loadingTimer = Timer(const Duration(milliseconds: 75), () {
-      _loadingShown = true;
-      if (mounted) setState(() => _loading = true);
-    });
+    if (mounted) setState(() => _loading = true);
 
     double? lat;
     double? lng;
@@ -111,18 +113,13 @@ class _HomePageState extends State<HomePage> {
 
     try {
       try {
-        final prefs = await SharedPreferences.getInstance();
-        final askedKey = kLocationPermissionRequestedKey;
-        final askedBefore = prefs.getBool(askedKey) ?? false;
-
         var permission = await Geolocator.checkPermission();
-        if (!askedBefore && !(permission == LocationPermission.always || permission == LocationPermission.whileInUse)) {
+        if (!(permission == LocationPermission.always || permission == LocationPermission.whileInUse)) {
           permission = await Geolocator.requestPermission();
-          await prefs.setBool(askedKey, true);
         }
 
         if (permission == LocationPermission.always || permission == LocationPermission.whileInUse) {
-          final pos = await Geolocator.getCurrentPosition(timeLimit: const Duration(seconds: 5));
+          final pos = await Geolocator.getCurrentPosition(timeLimit: const Duration(seconds: 10));
           lat = pos.latitude;
           lng = pos.longitude;
         }
@@ -140,9 +137,9 @@ class _HomePageState extends State<HomePage> {
         final headers = <String, String>{'Content-Type': 'application/json'};
         if (idToken != null) headers['Authorization'] = 'Bearer $idToken';
 
-        http.Response resp = await http.post(uri1, headers: headers, body: jsonEncode(payload)).timeout(const Duration(seconds: 6));
+        http.Response resp = await http.post(uri1, headers: headers, body: jsonEncode(payload)).timeout(const Duration(milliseconds: 20));
         if (resp.statusCode == 404) {
-          resp = await http.post(uri2, headers: headers, body: jsonEncode(payload)).timeout(const Duration(seconds: 6));
+          resp = await http.post(uri2, headers: headers, body: jsonEncode(payload)).timeout(const Duration(milliseconds: 20));
         }
 
         if (resp.statusCode >= 200 && resp.statusCode < 300) {
@@ -171,7 +168,6 @@ class _HomePageState extends State<HomePage> {
 
       await _repo.createMedicionForUser(user: _currentUser, medicion: medicion);
     } finally {
-      _loadingTimer?.cancel();
       if (mounted) {
         setState(() {
           _loading = false;
@@ -192,18 +188,19 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(AppTranslations.get('app_title', lang)),
+        title: Text(AppTranslations.get('app_title', lang), style: TextStyle(color: colorScheme.onPrimary)),
+        backgroundColor: AppColors.primary,
         actions: [
           IconButton(
             tooltip: AppTranslations.get('change_language', lang),
-            icon: const Icon(Icons.language),
+            icon: Icon(Icons.language, color: colorScheme.onPrimary),
             onPressed: () async {
               await localization.toggleLanguage();
             },
           ),
           IconButton(
             tooltip: AppTranslations.get('history', lang),
-            icon: const Icon(Icons.history),
+            icon: Icon(Icons.history, color: colorScheme.onPrimary),
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => MeasurementsHistoryPage(user: _currentUser)),
@@ -220,7 +217,7 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
               child: Align(
                 alignment: Alignment.centerLeft,
-                child: Text('${AppTranslations.get('welcome_message', lang)}$name', style: textTheme.titleLarge),
+                child: Text('${AppTranslations.get('welcome_message', lang)}$name', style: textTheme.titleLarge?.copyWith(color: AppColors.secondary)),
               ),
             ),
             Expanded(
@@ -241,6 +238,7 @@ class _HomePageState extends State<HomePage> {
                                 textAlign: TextAlign.center,
                                 style: textTheme.displayMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
+                                  color: AppColors.secondary,
                                 ),
                               ),
                               const SizedBox(height: 12),
@@ -268,6 +266,13 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             Padding(
+              padding: const EdgeInsets.symmetric(vertical: 16.0),
+              child: ElevatedButton(
+                onPressed: _refreshMeasurement,
+                child: Text('Consultar de nuevo', style: TextStyle(color: colorScheme.onSurface)),
+              ),
+            ),
+            Padding(
               padding: const EdgeInsets.only(bottom: 28.0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -275,7 +280,7 @@ class _HomePageState extends State<HomePage> {
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      IconButton(onPressed: () => _showEmergencyNumbers(context, lang), icon: const Icon(Icons.call, size: 28)),
+                      IconButton(onPressed: () => _showEmergencyNumbers(context, lang), icon: Icon(Icons.call, size: 28, color: colorScheme.onSurface)),
                       const SizedBox(height: 6),
                       Text(AppTranslations.get('emergency_numbers', lang)),
                     ],
@@ -283,7 +288,7 @@ class _HomePageState extends State<HomePage> {
                   Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      IconButton(onPressed: () => _showShareModal(context, lang), icon: const Icon(Icons.share, size: 28)),
+                      IconButton(onPressed: () => _showShareModal(context, lang), icon: Icon(Icons.share, size: 28, color: colorScheme.onSurface)),
                       const SizedBox(height: 6),
                       Text(AppTranslations.get('share_screenshot', lang)),
                     ],
@@ -315,6 +320,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _showShareModal(BuildContext context, String lang) async {
+    final colorScheme = Theme.of(context).colorScheme;
     final file = await _captureAndSavePng();
     if (file == null) {
       if (mounted) {
@@ -351,12 +357,12 @@ class _HomePageState extends State<HomePage> {
                     await Share.shareXFiles([XFile(file.path)]);
                     if (mounted) Navigator.of(context).pop();
                   },
-                  icon: const Icon(Icons.share),
-                  label: Text(AppTranslations.get('share_button', lang)),
+                  icon: Icon(Icons.share, color: colorScheme.onSurface),
+                  label: Text(AppTranslations.get('share_button', lang), style: TextStyle(color: colorScheme.onSurface)),
                 ),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(),
-                  child: Text(AppTranslations.get('close', lang)),
+                  child: Text(AppTranslations.get('close', lang), style: TextStyle(color: colorScheme.onSurface)),
                 ),
               ],
             ),
