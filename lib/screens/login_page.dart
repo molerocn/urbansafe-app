@@ -13,6 +13,7 @@ import '../src/app_translations.dart';
 import '../services/localization_service.dart';
 import 'register_page.dart';
 import 'home_page.dart';
+import 'forgot_password_page.dart';
 
 /// Página de inicio de sesión (UI similar a la del registro)
 class LoginPage extends StatefulWidget {
@@ -118,14 +119,14 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final localization = context.watch<LocalizationService>();
     final lang = localization.currentLanguageCode;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Scaffold(
-      backgroundColor: Colors.white,
       appBar: AppBar(backgroundColor: Colors.transparent, elevation: 0),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // Imagen superior
+            // Imagen superior (sin cambios)
             Stack(
               children: [
                 Image.asset(
@@ -137,7 +138,7 @@ class _LoginPageState extends State<LoginPage> {
                 Container(
                   width: double.infinity,
                   height: 200,
-                  color: Colors.black.withValues(alpha: 0.45),
+                  color: Colors.black.withAlpha((0.45 * 255).round()),
                 ),
                 Positioned.fill(
                   child: Align(
@@ -148,6 +149,7 @@ class _LoginPageState extends State<LoginPage> {
                         Text(
                           AppTranslations.get('app_title', lang),
                           style: const TextStyle(
+                            
                             color: Colors.white,
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
@@ -178,6 +180,7 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   // Campo correo
                   _buildField(
+                    context: context,
                     controller: _userController,
                     label: AppTranslations.get('email', lang),
                     keyboardType: TextInputType.emailAddress,
@@ -186,6 +189,7 @@ class _LoginPageState extends State<LoginPage> {
 
                   // Campo contraseña
                   _buildField(
+                    context: context,
                     controller: _passController,
                     label: AppTranslations.get('password', lang),
                     obscureText: true,
@@ -197,20 +201,18 @@ class _LoginPageState extends State<LoginPage> {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () {
-                        // Aquí podrías agregar funcionalidad de "recuperar contraseña"
+                        Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const ForgotPasswordPage(),
+                          ),
+                        );
                       },
-                      child: Text(
-                        AppTranslations.get('forgot_password', lang),
-                        style: const TextStyle(
-                          color: Colors.blueAccent,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
+                      child: Text(AppTranslations.get('forgot_password', lang)),
                     ),
                   ),
 
                   if (_error != null)
-                    Text(_error!, style: const TextStyle(color: Colors.red)),
+                    Text(_error!, style: TextStyle(color: colorScheme.error)),
 
                   const SizedBox(height: 20),
 
@@ -222,8 +224,8 @@ class _LoginPageState extends State<LoginPage> {
                           child: ElevatedButton(
                             onPressed: () => _loginWithFirestore(lang),
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blueAccent,
-                              foregroundColor: Colors.white,
+                              backgroundColor: colorScheme.primary,
+                              foregroundColor: colorScheme.onPrimary,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(20),
                               ),
@@ -253,15 +255,15 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       label: Text(
                         AppTranslations.get('google_signin', lang),
-                        style: const TextStyle(color: Colors.black87),
+                        style: TextStyle(color: colorScheme.onSurface),
                       ),
                       style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: Colors.grey.shade300),
+                        side: BorderSide(color: colorScheme.outline),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(30),
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 14),
-                        backgroundColor: Colors.grey.shade100,
+                        backgroundColor: colorScheme.surfaceContainerHighest,
                       ),
                       onPressed: _signInWithGoogle,
                     ),
@@ -284,8 +286,8 @@ class _LoginPageState extends State<LoginPage> {
                         },
                         child: Text(
                           AppTranslations.get('create_account', lang),
-                          style: const TextStyle(
-                            color: Colors.blueAccent,
+                          style: TextStyle(
+                            color: colorScheme.primary,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
@@ -319,11 +321,13 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildField({
+    required BuildContext context,
     required TextEditingController controller,
     required String label,
     bool obscureText = false,
     TextInputType keyboardType = TextInputType.text,
   }) {
+    final colorScheme = Theme.of(context).colorScheme;
     return TextField(
       controller: controller,
       obscureText: obscureText,
@@ -331,10 +335,21 @@ class _LoginPageState extends State<LoginPage> {
       decoration: InputDecoration(
         labelText: label,
         filled: true,
-        fillColor: Colors.blue.shade50,
+        fillColor: colorScheme.surfaceContainerHighest,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide.none,
+          borderSide: BorderSide(color: colorScheme.outline, width: 1.0),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(
+            color: colorScheme.outline.withAlpha((0.5 * 255).round()),
+            width: 1.0,
+          ),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(12),
+          borderSide: BorderSide(color: colorScheme.primary, width: 2.0),
         ),
       ),
     );

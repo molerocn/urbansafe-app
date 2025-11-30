@@ -55,6 +55,25 @@ class AppTranslations {
       'google_signin': 'Iniciar sesión con Google',
       'login_error': 'Error al iniciar sesión',
 
+      // Password Recovery
+      'recovery_instructions':
+          'Ingresa tu correo electrónico para recibir un código de recuperación.',
+      'email_not_found': 'No existe una cuenta con ese correo.',
+      'recovery_code_sent':
+          'Código de recuperación enviado. Revisa tu correo electrónico.',
+      'send_recovery_code': 'Enviar código de recuperación',
+      'enter_recovery_code':
+          'Ingresa el código de recuperación que recibiste en tu correo.',
+      'recovery_code': 'Código de recuperación',
+      'new_password': 'Nueva contraseña',
+      'confirm_password': 'Confirmar contraseña',
+      'reset_password': 'Restablecer contraseña',
+      'all_fields_required': 'Todos los campos son requeridos',
+      'passwords_do_not_match': 'Las contraseñas no coinciden',
+      'password_too_short': 'La contraseña debe tener al menos 6 caracteres',
+      'password_reset_success': 'Contraseña restablecida exitosamente',
+      'back': 'Volver',
+
       // Register Page
       'register_title': 'Crear cuenta',
       'full_name': 'Nombre completo',
@@ -82,6 +101,15 @@ class AppTranslations {
       'latitude': 'Latitud',
       'longitude': 'Longitud',
       'date_format': 'dd/MM/yyyy HH:mm',
+
+      // Profile Drawer
+      'edit_profile': 'Editar Perfil',
+      'name': 'Nombre',
+      'email_non_editable': 'Correo (no editable)',
+      'edit': 'Editar',
+      'save': 'Guardar',
+      'dark_mode': 'Modo oscuro',
+      'profile_update_error': 'Error al actualizar el perfil',
 
       // Permissions
       'location_permission': 'Permiso de ubicación',
@@ -155,6 +183,24 @@ class AppTranslations {
       'google_signin': 'Sign in with Google',
       'login_error': 'Error signing in',
 
+      // Password Recovery
+      'recovery_instructions':
+          'Enter your email address to receive a recovery code.',
+      'email_not_found': 'No account found with that email.',
+      'recovery_code_sent': 'Recovery code sent. Check your email.',
+      'send_recovery_code': 'Send Recovery Code',
+      'enter_recovery_code':
+          'Enter the recovery code you received in your email.',
+      'recovery_code': 'Recovery Code',
+      'new_password': 'New Password',
+      'confirm_password': 'Confirm Password',
+      'reset_password': 'Reset Password',
+      'all_fields_required': 'All fields are required',
+      'passwords_do_not_match': 'Passwords do not match',
+      'password_too_short': 'Password must be at least 6 characters',
+      'password_reset_success': 'Password reset successfully',
+      'back': 'Back',
+
       // Register Page
       'register_title': 'Create Account',
       'full_name': 'Full Name',
@@ -182,6 +228,15 @@ class AppTranslations {
       'latitude': 'Latitude',
       'longitude': 'Longitude',
       'date_format': 'MM/dd/yyyy HH:mm',
+
+      // Profile Drawer
+      'edit_profile': 'Edit Profile',
+      'name': 'Name',
+      'email_non_editable': 'Email (not editable)',
+      'edit': 'Edit',
+      'save': 'Save',
+      'dark_mode': 'Dark Mode',
+      'profile_update_error': 'Error updating profile',
 
       // Permissions
       'location_permission': 'Location Permission',
