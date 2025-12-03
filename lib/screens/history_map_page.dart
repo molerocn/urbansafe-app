@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:urbansafe/models/risk_measurement.dart';
 import '../src/app_colors.dart';
 
@@ -24,25 +25,58 @@ class _HistoryMapPageState extends State<HistoryMapPage> {
     _createMarkers();
   }
 
+  void _showDetails(BuildContext context, RiskMeasurement measurement) {
+    final localDateTime = measurement.fecha?.toDate().toLocal();
+    final formattedDate = localDateTime != null ? DateFormat('dd/MM/yyyy').format(localDateTime) : 'N/A';
+    final formattedTime = localDateTime != null ? DateFormat('HH:mm').format(localDateTime) : 'N/A';
+
+    showModalBottomSheet(context: context, builder: (builder) {
+        return Container(
+          height: 200.0,
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                'Nivel de riesgo: ${measurement.nivelRiesgoLabel ?? 'Desconocido'}',
+                style: Theme.of(context).textTheme.titleLarge,
+              ),
+              Text('Fecha: $formattedDate', style: Theme.of(context).textTheme.titleMedium),
+              Text('Hora: $formattedTime', style: Theme.of(context).textTheme.titleMedium),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  child: const Text('Cerrar'),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+              )
+            ],
+          ),
+        );
+      }, 
+    );
+  }
+
   void _createMarkers() {
     // Marcadores reales basados en el historial
     for (var measurement in widget.measurements) {
       if (measurement.ubicacionLat != null && measurement.ubicacionLng != null) {
         final hue = _hueForRisk(measurement);
+
         final marker = Marker(
           markerId: MarkerId(measurement.id ?? measurement.fecha.toString()),
           position: LatLng(measurement.ubicacionLat!, measurement.ubicacionLng!),
-          infoWindow: InfoWindow(
-            title: measurement.nivelRiesgoLabel,
-            snippet: 'Fecha: ${measurement.fecha?.toDate().toLocal().toString() ?? 'N/A'}',
-          ),
           icon: BitmapDescriptor.defaultMarkerWithHue(hue),
+          onTap: () {
+            _showDetails(context, measurement);
+          },
         );
         _markers.add(marker);
       }
     }
 
-    // DUMMY MARKERS - START (Para eliminar después de la demo)
+    /* DUMMY MARKERS - START (Para eliminar después de la demo)
     _markers.add(Marker(
       markerId: const MarkerId('dummy_1'),
       position: const LatLng(-11.972924, -77.120258),
@@ -67,7 +101,7 @@ class _HistoryMapPageState extends State<HistoryMapPage> {
       infoWindow: const InfoWindow(title: 'Muy peligroso - Demo_4'),
       icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
     ));
-    // DUMMY MARKERS - END
+    // DUMMY MARKERS - END*/
   }
 
   double _hueForRisk(RiskMeasurement m) {
