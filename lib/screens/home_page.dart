@@ -98,7 +98,7 @@ class _HomePageState extends State<HomePage> {
         }
 
         if (permission == LocationPermission.always || permission == LocationPermission.whileInUse) {
-          final pos = await Geolocator.getCurrentPosition(timeLimit: const Duration(seconds: 10));
+          final pos = await Geolocator.getCurrentPosition(timeLimit: const Duration(milliseconds: 900));
           lat = pos.latitude;
           lng = pos.longitude;
         }
@@ -119,7 +119,7 @@ class _HomePageState extends State<HomePage> {
         final headers = <String, String>{'Content-Type': 'application/json'};
         if (idToken != null) headers['Authorization'] = 'Bearer $idToken';
 
-        final resp = await http.post(uri, headers: headers, body: jsonEncode(payload)).timeout(const Duration(seconds: 10));
+        final resp = await http.post(uri, headers: headers, body: jsonEncode(payload)).timeout(const Duration(milliseconds: 900));
 
         if (resp.statusCode >= 200 && resp.statusCode < 300) {
           apiResult = jsonDecode(resp.body) as Map<String, dynamic>;
