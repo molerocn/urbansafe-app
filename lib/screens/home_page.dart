@@ -43,6 +43,7 @@ class _HomePageState extends State<HomePage> {
   bool _loading = false;
   String _riskLabel = '';
   double _riskValue = 0.0;
+  String _riskMessage = '';
 
   @override
   void initState() {
@@ -62,42 +63,20 @@ class _HomePageState extends State<HomePage> {
       _saved = false;
       _riskLabel = '';
       _riskValue = 0.0;
+      _riskMessage = '';
     });
     _fetchPredictAndSave();
   }
 
   double _mapLabelToValue(String label) {
     final s = label.toLowerCase();
-    if (s.contains('muy') && s.contains('alta')) {
+    if (s.contains('alto')) {
       return 4.0;
     }
-    if (s.contains('alta')) {
-      return 3.0;
-    }
-    if (s.contains('media')) {
-      return 2.0;
-    }
-    if (s.contains('baja')) {
+    if (s.contains('bajo')) {
       return 1.0;
     }
     return 0.0;
-  }
-
-  String _mapLabelToDescription(String label, String languageCode) {
-    final s = label.toLowerCase();
-    if (s.contains('muy') && s.contains('alta')) {
-      return AppTranslations.get('risk_description_very_high', languageCode);
-    }
-    if (s.contains('alta')) {
-      return AppTranslations.get('risk_description_high', languageCode);
-    }
-    if (s.contains('media')) {
-      return AppTranslations.get('risk_description_medium', languageCode);
-    }
-    if (s.contains('baja')) {
-      return AppTranslations.get('risk_description_low', languageCode);
-    }
-    return AppTranslations.get('risk_description_unknown', languageCode);
   }
 
   Future<void> _fetchPredictAndSave() async {
@@ -127,20 +106,20 @@ class _HomePageState extends State<HomePage> {
         appLog('Error while obtaining location: $e', tag: 'location');
       }
 
-      final payload = <String, dynamic>{'lat': lat, 'lng': lng};
+      final payload = <String, dynamic>{
+        'latitud': lat,
+        'longitud': lng,
+        'fecha_hora': DateTime.now().toIso8601String().replaceFirst('T', ' ').substring(0, 19), // Formato YYYY-MM-DD HH:MM:SS
+      };
       Map<String, dynamic>? apiResult;
 
       try {
-        final uri1 = Uri.parse('$kPredictApiBase$kPredictRiskPath');
-        final uri2 = Uri.parse('$kPredictApiBase$kPredictPath');
+        final uri = Uri.parse('https://urbansafe-ml.onrender.com/predict');
         String? idToken = await fb_auth.FirebaseAuth.instance.currentUser?.getIdToken();
         final headers = <String, String>{'Content-Type': 'application/json'};
         if (idToken != null) headers['Authorization'] = 'Bearer $idToken';
 
-        http.Response resp = await http.post(uri1, headers: headers, body: jsonEncode(payload)).timeout(const Duration(milliseconds: 20));
-        if (resp.statusCode == 404) {
-          resp = await http.post(uri2, headers: headers, body: jsonEncode(payload)).timeout(const Duration(milliseconds: 20));
-        }
+        final resp = await http.post(uri, headers: headers, body: jsonEncode(payload)).timeout(const Duration(seconds: 10));
 
         if (resp.statusCode >= 200 && resp.statusCode < 300) {
           apiResult = jsonDecode(resp.body) as Map<String, dynamic>;
@@ -150,12 +129,14 @@ class _HomePageState extends State<HomePage> {
       }
 
       if (apiResult != null) {
-        final s = apiResult['score'];
-        final l = apiResult['label'];
-        if (s is num) value = s.toDouble();
+        final p = apiResult['probabilidad'];
+        final l = apiResult['nivel_riesgo'];
+        final m = apiResult['mensaje'];
+        if (p is num) value = p.toDouble();
         if (l is String) label = l;
+        if (m is String) _riskMessage = m;
       } else {
-        label = 'Muy alta';
+        label = 'Alto';
         value = _mapLabelToValue(label);
       }
 
@@ -173,6 +154,7 @@ class _HomePageState extends State<HomePage> {
           _loading = false;
           _riskLabel = label;
           _riskValue = value;
+          _riskMessage = _riskMessage;
         });
       }
     }
@@ -190,6 +172,7 @@ class _HomePageState extends State<HomePage> {
       appBar: AppBar(
         title: Text(AppTranslations.get('app_title', lang), style: TextStyle(color: colorScheme.onPrimary)),
         backgroundColor: AppColors.primary,
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           IconButton(
             tooltip: AppTranslations.get('change_language', lang),
@@ -234,7 +217,15 @@ class _HomePageState extends State<HomePage> {
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               Text(
-                                _riskLabel.isNotEmpty ? _riskLabel : AppTranslations.get('risk_very_high', lang),
+                                (() {
+                                  String displayLabel = AppTranslations.get('risk_unknown', lang);
+                                  if (_riskLabel.toLowerCase().contains('alto')) {
+                                    displayLabel = AppTranslations.get('risk_high', lang);
+                                  } else if (_riskLabel.toLowerCase().contains('bajo')) {
+                                    displayLabel = AppTranslations.get('risk_low', lang);
+                                  }
+                                  return displayLabel;
+                                })(),
                                 textAlign: TextAlign.center,
                                 style: textTheme.displayMedium?.copyWith(
                                   fontWeight: FontWeight.bold,
@@ -247,15 +238,20 @@ class _HomePageState extends State<HomePage> {
                                 child: Column(
                                   children: [
                                     Text(
-                                      _riskLabel.isNotEmpty ? _mapLabelToDescription(_riskLabel, lang) : AppTranslations.get('risk_description_very_high', lang),
+                                      (() {
+                                        String message = '';
+                                        if (_riskLabel.toLowerCase().contains('alto')) {
+                                          message = AppTranslations.get('risk_message_high', lang);
+                                        } else if (_riskLabel.toLowerCase().contains('bajo')) {
+                                          message = AppTranslations.get('risk_message_low', lang);
+                                        } else {
+                                          message = _riskMessage.isNotEmpty ? _riskMessage : AppTranslations.get('risk_description_high', lang);
+                                        }
+                                        return message;
+                                      })(),
                                       textAlign: TextAlign.center,
                                       style: textTheme.bodyMedium?.copyWith(color: colorScheme.onSurface.withOpacity(0.7)),
                                     ),
-                                    if (_riskValue > 0)
-                                      Padding(
-                                        padding: const EdgeInsets.only(top: 8.0),
-                                        child: Text('${AppTranslations.get('score', lang)}: ${_riskValue.toStringAsFixed(2)}', style: textTheme.bodySmall?.copyWith(color: colorScheme.onSurface.withOpacity(0.5))),
-                                      ),
                                   ],
                                 ),
                               ),
@@ -269,7 +265,7 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.symmetric(vertical: 16.0),
               child: ElevatedButton(
                 onPressed: _refreshMeasurement,
-                child: Text('Consultar de nuevo', style: TextStyle(color: colorScheme.onSurface)),
+                child: Text(AppTranslations.get('refresh', lang), style: TextStyle(color: colorScheme.onSurface)),
               ),
             ),
             Padding(
@@ -404,7 +400,10 @@ class _HomePageState extends State<HomePage> {
             const SizedBox(height: 8),
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
-              child: Text(AppTranslations.get('close', lang)),
+              child: Text(
+                AppTranslations.get('close', lang),
+                style: TextStyle(color: Theme.of(ctx).brightness == Brightness.dark ? Colors.white : null),
+              ),
             ),
           ],
         ),
