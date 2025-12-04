@@ -14,6 +14,7 @@ import '../src/app_translations.dart';
 import '../services/localization_service.dart';
 import 'register_page.dart';
 import 'home_page.dart';
+import 'forgot_password_page.dart';
 
 /// Página de inicio de sesión (UI similar a la del registro)
 class LoginPage extends StatefulWidget {
@@ -200,11 +201,13 @@ class _LoginPageState extends State<LoginPage> {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () {
-                        // Aquí podrías agregar funcionalidad de "recuperar contraseña"
+                         Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (_) => const ForgotPasswordPage(),
+                          ),
+                        );
                       },
-                      child: Text(
-                        AppTranslations.get('forgot_password', lang),
-                      ),
+                      child: Text(AppTranslations.get('forgot_password', lang)),
                     ),
                   ),
 
@@ -333,14 +336,17 @@ class _LoginPageState extends State<LoginPage> {
       decoration: InputDecoration(
         labelText: label,
         filled: true,
-        fillColor: colorScheme.surfaceVariant,
+        fillColor: colorScheme.surfaceContainerHighest,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.outline, width: 1.0),
+           borderSide: BorderSide(color: colorScheme.outline, width: 1.0),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(color: colorScheme.outline.withOpacity(0.5), width: 1.0),
+          borderSide: BorderSide(
+            color: colorScheme.outline.withAlpha((0.5 * 255).round()),
+            width: 1.0,
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
