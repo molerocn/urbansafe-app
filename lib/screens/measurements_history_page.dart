@@ -40,30 +40,19 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
   Icon _iconForMedicion(RiskMeasurement m) {
     final label = (m.nivelRiesgoLabel ?? '').toLowerCase();
     final colorScheme = Theme.of(context).colorScheme;
-    if (label.contains('muy') && label.contains('alta')) {
-      return Icon(Icons.priority_high, color: colorScheme.error);
-    }
-    if (label.contains('alta')) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    if (label.contains('alto')) {
       return Icon(Icons.warning, color: colorScheme.error);
     }
-    if (label.contains('media')) {
-      return Icon(Icons.report_problem, color: AppColors.secondary);
-    }
-    if (label.contains('baja')) {
-      return Icon(Icons.check_circle, color: colorScheme.primary);
+    if (label.contains('bajo')) {
+      return Icon(Icons.check_circle, color: isDark ? Colors.green : colorScheme.primary);
     }
     // fallback based on numeric
     final v = m.nivelRiesgo;
-    if (v >= 3.5) {
-      return Icon(Icons.priority_high, color: colorScheme.error);
-    }
     if (v >= 2.5) {
       return Icon(Icons.warning, color: colorScheme.error);
     }
-    if (v >= 1.5) {
-      return Icon(Icons.report_problem, color: AppColors.secondary);
-    }
-    return Icon(Icons.check_circle, color: colorScheme.primary);
+    return Icon(Icons.check_circle, color: isDark ? Colors.green : colorScheme.primary);
   }
 
   // Formatea la fecha de la medición para mostrarla en la lista.
@@ -185,6 +174,7 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
       appBar: AppBar(
         title: Text(AppTranslations.get('history_title', lang), style: TextStyle(color: AppColors.secondary)),
         backgroundColor: Theme.of(context).colorScheme.primary,
+        iconTheme: const IconThemeData(color: Colors.white),
         actions: [
           if (_items.isNotEmpty) // Solo muestra el botón si hay mediciones
             IconButton(
@@ -236,11 +226,16 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
                           separatorBuilder: (_, __) => const Divider(height: 1),
                           itemBuilder: (context, index) {
                             final m = _items[index];
-                            final label =
-                                m.nivelRiesgoLabel ?? m.nivelRiesgo.toString();
+                            final rawLabel = m.nivelRiesgoLabel ?? m.nivelRiesgo.toString();
+                            String displayLabel = AppTranslations.get('risk_unknown', lang);
+                            if (rawLabel.toLowerCase().contains('alto')) {
+                              displayLabel = AppTranslations.get('risk_high', lang);
+                            } else if (rawLabel.toLowerCase().contains('bajo')) {
+                              displayLabel = AppTranslations.get('risk_low', lang);
+                            }
                             return ListTile(
                               leading: _iconForMedicion(m),
-                              title: Text(label),
+                              title: Text(displayLabel),
                               subtitle: Text(_formatDate(m.fecha, lang)),
                               trailing: Text(m.user?['nombre'] ?? ''),
                               onTap: () {
@@ -248,14 +243,14 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
                                   context: context,
                                   builder: (_) => AlertDialog(
                                     title: Text(
-                                      '${AppTranslations.get('risk_level', lang)} - $label',
+                                      '${AppTranslations.get('risk_level', lang)} - $displayLabel',
                                     ),
                                     content: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          '${AppTranslations.get('risk_level', lang)}: $label',
+                                          '${AppTranslations.get('risk_level', lang)}: $displayLabel',
                                         ),
                                         const SizedBox(height: 8),
                                         Text(
@@ -275,6 +270,7 @@ class _MeasurementsHistoryPageState extends State<MeasurementsHistoryPage> {
                                         onPressed: () => Navigator.pop(context),
                                         child: Text(
                                           AppTranslations.get('close', lang),
+                                          style: TextStyle(color: Theme.of(context).brightness == Brightness.dark ? Colors.white : null),
                                         ),
                                       ),
                                     ],
